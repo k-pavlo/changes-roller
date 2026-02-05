@@ -1,0 +1,16 @@
+[project]
+name = "changes-roller"
+version = "0.1.0"
+description = "A command-line tool for creating and managing coordinated patch series across multiple Git repositories"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1.0",
+]
+
+[project.scripts]
+roller = "roller.cli:cli"
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
