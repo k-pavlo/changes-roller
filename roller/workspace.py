@@ -25,9 +25,10 @@ class Workspace:
 
     def cleanup(self):
         """Clean up the workspace directory."""
-        if self.path and self.path.exists():
-            import shutil
-            shutil.rmtree(self.path)
+        if self.path:
+            if self.path.exists():
+                import shutil
+                shutil.rmtree(self.path)
             self.path = None
 
     def get_repo_path(self, repo_name: str) -> Path:
