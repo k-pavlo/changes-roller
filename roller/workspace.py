@@ -2,18 +2,17 @@
 Workspace management for changes-roller.
 """
 
-import tempfile
 import secrets
+import tempfile
 from pathlib import Path
-from typing import Optional
 
 
 class Workspace:
     """Manages temporary workspace for patch series execution."""
 
-    def __init__(self, base_dir: Optional[Path] = None):
+    def __init__(self, base_dir: Path | None = None):
         self.base_dir = base_dir or Path(tempfile.gettempdir())
-        self.path: Optional[Path] = None
+        self.path: Path | None = None
 
     def create(self) -> Path:
         """Create a new workspace directory."""
@@ -23,11 +22,12 @@ class Workspace:
         self.path.mkdir(parents=True, exist_ok=True)
         return self.path
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Clean up the workspace directory."""
         if self.path:
             if self.path.exists():
                 import shutil
+
                 shutil.rmtree(self.path)
             self.path = None
 

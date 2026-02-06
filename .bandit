@@ -1,0 +1,17 @@
+# Bandit configuration for changes-roller
+# These warnings are intentional for this Git automation tool
+
+# Exclude test directories
+exclude_dirs:
+  - /tests/
+
+# Skip checks:
+# - B101: assert is OK for runtime validation
+# - B404/B603/B607: subprocess and git commands are core functionality
+# - B602: shell=True is intentional for run_command (executes user patch scripts)
+skips:
+  - B101
+  - B404
+  - B603
+  - B607
+  - B602

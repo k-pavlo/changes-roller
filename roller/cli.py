@@ -13,8 +13,8 @@ from .reporter import Reporter
 
 
 @click.group()
-@click.version_option(version='0.1.0', prog_name='roller')
-def cli():
+@click.version_option(version="0.1.0", prog_name="roller")
+def cli() -> None:
     """
     changes-roller: A tool for creating and managing coordinated patch series
     across multiple Git repositories.
@@ -24,19 +24,14 @@ def cli():
 
 @cli.command()
 @click.option(
-    '--output',
-    '-o',
+    "--output",
+    "-o",
     type=click.Path(path_type=Path),
-    default='series.ini',
-    help='Output file path (default: series.ini)'
+    default="series.ini",
+    help="Output file path (default: series.ini)",
 )
-@click.option(
-    '--force',
-    '-f',
-    is_flag=True,
-    help='Overwrite existing file'
-)
-def init(output: Path, force: bool):
+@click.option("--force", "-f", is_flag=True, help="Overwrite existing file")
+def init(output: Path, force: bool) -> None:
     """
     Generate a template configuration file.
 
@@ -50,7 +45,10 @@ def init(output: Path, force: bool):
     """
     # Check if file already exists
     if output.exists() and not force:
-        click.echo(f"Error: File '{output}' already exists. Use --force to overwrite.", err=True)
+        click.echo(
+            f"Error: File '{output}' already exists. Use --force to overwrite.",
+            err=True,
+        )
         sys.exit(1)
 
     # Template configuration
@@ -107,9 +105,9 @@ command = tox
     try:
         output.write_text(template)
         click.echo(f"Created configuration file: {output}")
-        click.echo(f"\nNext steps:")
+        click.echo("\nNext steps:")
         click.echo(f"  1. Edit {output} to customize your patch series")
-        click.echo(f"  2. Create your patch script (e.g., patch.sh)")
+        click.echo("  2. Create your patch script (e.g., patch.sh)")
         click.echo(f"  3. Run: roller create --config-file {output}")
     except Exception as e:
         click.echo(f"Error creating file: {e}", err=True)
@@ -118,27 +116,23 @@ command = tox
 
 @cli.command()
 @click.option(
-    '--config-file',
+    "--config-file",
     type=click.Path(exists=True, path_type=Path),
     required=True,
-    help='Path to configuration file'
+    help="Path to configuration file",
 )
 @click.option(
-    '--config-dir',
+    "--config-dir",
     type=click.Path(exists=True, file_okay=False, path_type=Path),
-    help='Additional directory for config files (optional)'
+    help="Additional directory for config files (optional)",
 )
 @click.option(
-    '-e', '--exit-on-error',
-    is_flag=True,
-    help='Exit immediately on first failure'
+    "-e", "--exit-on-error", is_flag=True, help="Exit immediately on first failure"
 )
-@click.option(
-    '-v', '--verbose',
-    is_flag=True,
-    help='Enable verbose output'
-)
-def create(config_file: Path, config_dir: Path, exit_on_error: bool, verbose: bool):
+@click.option("-v", "--verbose", is_flag=True, help="Enable verbose output")
+def create(
+    config_file: Path, config_dir: Path, exit_on_error: bool, verbose: bool
+) -> None:
     """
     Create a new patch series across multiple repositories.
 
@@ -177,9 +171,10 @@ def create(config_file: Path, config_dir: Path, exit_on_error: bool, verbose: bo
         click.echo(f"Unexpected error: {e}", err=True)
         if verbose:
             import traceback
+
             traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

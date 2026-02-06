@@ -3,8 +3,8 @@ Shared pytest fixtures for changes-roller tests.
 """
 
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 
@@ -69,7 +69,7 @@ def sample_series_config() -> SeriesConfig:
     return SeriesConfig(
         projects=[
             "https://github.com/org/repo1.git",
-            "https://github.com/org/repo2.git"
+            "https://github.com/org/repo2.git",
         ],
         commands="./patch.sh",
         commit_msg="Update dependencies in {{ project_name }}",
@@ -78,7 +78,7 @@ def sample_series_config() -> SeriesConfig:
         review=False,
         run_tests=True,
         tests_blocking=False,
-        test_command="pytest"
+        test_command="pytest",
     )
 
 

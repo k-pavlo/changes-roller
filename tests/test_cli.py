@@ -3,12 +3,11 @@ Tests for CLI module.
 """
 
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-import pytest
 from click.testing import CliRunner
 
-from roller.cli import cli, init, create
+from roller.cli import cli, create, init
 
 
 class TestInitCommand:
@@ -20,7 +19,7 @@ class TestInitCommand:
         output_file = temp_dir / "series.ini"
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(output_file)])
+            result = runner.invoke(init, ["--output", str(output_file)])
 
         assert result.exit_code == 0
         assert output_file.exists()
@@ -45,7 +44,7 @@ class TestInitCommand:
         output_file.write_text("existing content")
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(output_file)])
+            result = runner.invoke(init, ["--output", str(output_file)])
 
         assert result.exit_code == 1
         assert "already exists" in result.output
@@ -59,7 +58,7 @@ class TestInitCommand:
         output_file.write_text("existing content")
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(output_file), '--force'])
+            result = runner.invoke(init, ["--output", str(output_file), "--force"])
 
         assert result.exit_code == 0
         assert "Created configuration file" in result.output
@@ -73,7 +72,7 @@ class TestInitCommand:
         output_file = temp_dir / "test.ini"
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(output_file)])
+            runner.invoke(init, ["--output", str(output_file)])
 
         content = output_file.read_text()
         assert "[SERIE]" in content
@@ -90,7 +89,7 @@ class TestInitCommand:
         output_file = temp_dir / "test.ini"
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(output_file)])
+            result = runner.invoke(init, ["--output", str(output_file)])
 
         assert "Next steps:" in result.output
         assert "Edit" in result.output
@@ -104,7 +103,7 @@ class TestInitCommand:
         invalid_path.mkdir()
 
         with runner.isolated_filesystem(temp_dir=temp_dir):
-            result = runner.invoke(init, ['--output', str(invalid_path)])
+            result = runner.invoke(init, ["--output", str(invalid_path)])
 
         assert result.exit_code == 1
         # File exists check happens first, so we get "already exists" error
@@ -114,8 +113,8 @@ class TestInitCommand:
 class TestCreateCommand:
     """Tests for the create command."""
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
     def test_create_success(self, mock_config_parser, mock_executor, config_file: Path):
         """Test successful create command."""
         # Mock config parser
@@ -130,14 +129,14 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file)])
+        result = runner.invoke(create, ["--config-file", str(config_file)])
 
         assert result.exit_code == 0
         mock_config_parser.assert_called_once_with(config_file)
         mock_executor_instance.execute.assert_called_once()
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
     def test_create_failure(self, mock_config_parser, mock_executor, config_file: Path):
         """Test create command when execution fails."""
         # Mock config parser
@@ -152,7 +151,7 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file)])
+        result = runner.invoke(create, ["--config-file", str(config_file)])
 
         assert result.exit_code == 1
 
@@ -161,12 +160,12 @@ class TestCreateCommand:
         runner = CliRunner()
         missing_file = temp_dir / "nonexistent.ini"
 
-        result = runner.invoke(create, ['--config-file', str(missing_file)])
+        result = runner.invoke(create, ["--config-file", str(missing_file)])
 
         assert result.exit_code == 2  # Click's exit code for bad parameter
         assert "does not exist" in result.output.lower()
 
-    @patch('roller.cli.ConfigParser')
+    @patch("roller.cli.ConfigParser")
     def test_create_config_error(self, mock_config_parser, config_file: Path):
         """Test create command when config parsing fails."""
         # Mock parser to raise ValueError
@@ -175,15 +174,17 @@ class TestCreateCommand:
         mock_config_parser.return_value = mock_parser_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file)])
+        result = runner.invoke(create, ["--config-file", str(config_file)])
 
         assert result.exit_code == 1
         assert "Configuration error" in result.output
         assert "Invalid config" in result.output
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
-    def test_create_verbose_mode(self, mock_config_parser, mock_executor, config_file: Path):
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
+    def test_create_verbose_mode(
+        self, mock_config_parser, mock_executor, config_file: Path
+    ):
         """Test create command with verbose flag."""
         # Mock config parser
         mock_config = MagicMock()
@@ -197,15 +198,17 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file), '--verbose'])
+        result = runner.invoke(create, ["--config-file", str(config_file), "--verbose"])
 
         assert result.exit_code == 0
         # Reporter should be created with verbose=True
         # We can't directly check this without more mocking, but command should succeed
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
-    def test_create_exit_on_error_flag(self, mock_config_parser, mock_executor, config_file: Path):
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
+    def test_create_exit_on_error_flag(
+        self, mock_config_parser, mock_executor, config_file: Path
+    ):
         """Test create command with exit-on-error flag."""
         # Mock config parser
         mock_config = MagicMock()
@@ -219,16 +222,20 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file), '--exit-on-error'])
+        result = runner.invoke(
+            create, ["--config-file", str(config_file), "--exit-on-error"]
+        )
 
         assert result.exit_code == 0
         # Executor should be created with exit_on_error=True
         call_args = mock_executor.call_args
         assert call_args[0][2] is True  # Third argument is exit_on_error
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
-    def test_create_keyboard_interrupt(self, mock_config_parser, mock_executor, config_file: Path):
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
+    def test_create_keyboard_interrupt(
+        self, mock_config_parser, mock_executor, config_file: Path
+    ):
         """Test create command when interrupted by user."""
         # Mock config parser
         mock_config = MagicMock()
@@ -242,14 +249,16 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file)])
+        result = runner.invoke(create, ["--config-file", str(config_file)])
 
         assert result.exit_code == 130  # Standard exit code for SIGINT
         assert "Interrupted by user" in result.output
 
-    @patch('roller.cli.PatchExecutor')
-    @patch('roller.cli.ConfigParser')
-    def test_create_unexpected_error(self, mock_config_parser, mock_executor, config_file: Path):
+    @patch("roller.cli.PatchExecutor")
+    @patch("roller.cli.ConfigParser")
+    def test_create_unexpected_error(
+        self, mock_config_parser, mock_executor, config_file: Path
+    ):
         """Test create command with unexpected error."""
         # Mock config parser
         mock_config = MagicMock()
@@ -263,7 +272,7 @@ class TestCreateCommand:
         mock_executor.return_value = mock_executor_instance
 
         runner = CliRunner()
-        result = runner.invoke(create, ['--config-file', str(config_file)])
+        result = runner.invoke(create, ["--config-file", str(config_file)])
 
         assert result.exit_code == 1
         assert "Unexpected error" in result.output
@@ -275,7 +284,7 @@ class TestCLIGroup:
     def test_cli_version(self):
         """Test CLI version option."""
         runner = CliRunner()
-        result = runner.invoke(cli, ['--version'])
+        result = runner.invoke(cli, ["--version"])
 
         assert result.exit_code == 0
         assert "0.1.0" in result.output
@@ -284,7 +293,7 @@ class TestCLIGroup:
     def test_cli_help(self):
         """Test CLI help message."""
         runner = CliRunner()
-        result = runner.invoke(cli, ['--help'])
+        result = runner.invoke(cli, ["--help"])
 
         assert result.exit_code == 0
         assert "changes-roller" in result.output
@@ -294,7 +303,7 @@ class TestCLIGroup:
     def test_init_help(self):
         """Test init command help."""
         runner = CliRunner()
-        result = runner.invoke(cli, ['init', '--help'])
+        result = runner.invoke(cli, ["init", "--help"])
 
         assert result.exit_code == 0
         assert "Generate a template configuration file" in result.output
@@ -304,7 +313,7 @@ class TestCLIGroup:
     def test_create_help(self):
         """Test create command help."""
         runner = CliRunner()
-        result = runner.invoke(cli, ['create', '--help'])
+        result = runner.invoke(cli, ["create", "--help"])
 
         assert result.exit_code == 0
         assert "Create a new patch series" in result.output

@@ -103,6 +103,7 @@ class TestWorkspace:
 
         # Manually delete the workspace
         import shutil
+
         shutil.rmtree(path)
 
         # Cleanup should not raise an error

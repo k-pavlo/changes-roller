@@ -4,9 +4,8 @@ Integration tests for changes-roller.
 These tests verify the full workflow end-to-end with real Git repositories.
 """
 
-import subprocess
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -31,8 +30,10 @@ class TestFullWorkflow:
         assert executor.config.commands == config.commands
         assert executor.reporter == reporter
 
-    @patch('roller.executor.Repository')
-    def test_end_to_end_workflow_with_mocked_git(self, mock_repo_class, temp_dir: Path, executable_script: Path):
+    @patch("roller.executor.Repository")
+    def test_end_to_end_workflow_with_mocked_git(
+        self, mock_repo_class, temp_dir: Path, executable_script: Path
+    ):
         """Test complete workflow with mocked Git operations."""
         # Create a config file
         config_content = f"""[SERIE]
@@ -71,7 +72,7 @@ review = false
 
         assert success is True
         assert len(reporter.results) == 1
-        assert reporter.results[0]['status'] == 'succeeded'
+        assert reporter.results[0]["status"] == "succeeded"
 
     def test_workspace_lifecycle(self, temp_dir: Path):
         """Test workspace creation and cleanup lifecycle."""
@@ -96,8 +97,10 @@ review = false
         assert not path.exists()
         assert workspace.path is None
 
-    @patch('roller.executor.Repository')
-    def test_multiple_repositories_parallel_processing(self, mock_repo_class, temp_dir: Path, executable_script: Path):
+    @patch("roller.executor.Repository")
+    def test_multiple_repositories_parallel_processing(
+        self, mock_repo_class, temp_dir: Path, executable_script: Path
+    ):
         """Test processing multiple repositories in parallel."""
         # Create config with multiple projects
         config_content = f"""[SERIE]
@@ -136,10 +139,12 @@ commit = false
         # Don't call full execute() as it requires actual script file validation
         # Instead test the repository processing individually
         for idx, project in enumerate(config.projects):
-            executor._process_repository(project, idx + 1, len(config.projects), executable_script)
+            executor._process_repository(
+                project, idx + 1, len(config.projects), executable_script
+            )
 
         assert len(reporter.results) == 3
-        assert all(r['status'] == 'skipped' for r in reporter.results)
+        assert all(r["status"] == "skipped" for r in reporter.results)
 
     def test_reporter_accumulates_results(self):
         """Test that reporter correctly accumulates results."""
@@ -154,15 +159,15 @@ commit = false
         assert len(reporter.results) == 4
 
         # Count by status
-        succeeded = sum(1 for r in reporter.results if r['status'] == 'succeeded')
-        failed = sum(1 for r in reporter.results if r['status'] == 'failed')
-        skipped = sum(1 for r in reporter.results if r['status'] == 'skipped')
+        succeeded = sum(1 for r in reporter.results if r["status"] == "succeeded")
+        failed = sum(1 for r in reporter.results if r["status"] == "failed")
+        skipped = sum(1 for r in reporter.results if r["status"] == "skipped")
 
         assert succeeded == 2
         assert failed == 1
         assert skipped == 1
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_repository_operations_sequence(self, mock_run, temp_dir: Path):
         """Test the sequence of Git operations on a repository."""
         from roller.repository import Repository
@@ -174,11 +179,15 @@ commit = false
 
         # Clone
         repo.clone()
-        assert any('git' in str(call[0][0]) and 'clone' in str(call[0][0])
-                   for call in mock_run.call_args_list)
+        assert any(
+            "git" in str(call[0][0]) and "clone" in str(call[0][0])
+            for call in mock_run.call_args_list
+        )
 
         # Check for changes
-        mock_run.return_value = MagicMock(returncode=0, stdout=" M file.txt\n", stderr="")
+        mock_run.return_value = MagicMock(
+            returncode=0, stdout=" M file.txt\n", stderr=""
+        )
         has_changes = repo.has_changes()
         assert has_changes is True
 
@@ -189,7 +198,7 @@ commit = false
         # Commit
         mock_run.side_effect = [
             MagicMock(returncode=0),  # commit
-            MagicMock(returncode=0, stdout="abc123d\n")  # rev-parse
+            MagicMock(returncode=0, stdout="abc123d\n"),  # rev-parse
         ]
         commit_hash = repo.commit("Test message")
         assert commit_hash == "abc123d"
@@ -216,8 +225,10 @@ command = pytest -v
         assert config.tests_blocking is True
         assert config.test_command == "pytest -v"
 
-    @patch('roller.executor.Repository')
-    def test_error_handling_propagation(self, mock_repo_class, temp_dir: Path, executable_script: Path):
+    @patch("roller.executor.Repository")
+    def test_error_handling_propagation(
+        self, mock_repo_class, temp_dir: Path, executable_script: Path
+    ):
         """Test that errors are properly caught and reported."""
         from roller.repository import RepositoryError
 
@@ -247,18 +258,18 @@ commit_msg = Test
 
         assert success is False
         assert len(reporter.results) == 1
-        assert reporter.results[0]['status'] == 'failed'
-        assert 'Network error' in reporter.results[0]['details']
+        assert reporter.results[0]["status"] == "failed"
+        assert "Network error" in reporter.results[0]["details"]
 
     def test_commit_message_rendering(self, temp_dir: Path):
         """Test commit message template rendering."""
-        from roller.executor import PatchExecutor
         from roller.config import SeriesConfig
+        from roller.executor import PatchExecutor
 
         config = SeriesConfig(
             projects=["https://github.com/test/repo.git"],
             commands="./patch.sh",
-            commit_msg="Update {{ project_name }} to version 2.0"
+            commit_msg="Update {{ project_name }} to version 2.0",
         )
 
         reporter = Reporter()

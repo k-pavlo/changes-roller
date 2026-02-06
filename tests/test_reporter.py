@@ -2,8 +2,6 @@
 Tests for reporter module.
 """
 
-import pytest
-
 from roller.reporter import Reporter, Status
 
 

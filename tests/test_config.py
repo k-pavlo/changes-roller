@@ -178,7 +178,7 @@ class TestSeriesConfig:
         config = SeriesConfig(
             projects=["https://github.com/org/repo.git"],
             commands="./patch.sh",
-            commit_msg="Test commit"
+            commit_msg="Test commit",
         )
 
         assert config.projects == ["https://github.com/org/repo.git"]
