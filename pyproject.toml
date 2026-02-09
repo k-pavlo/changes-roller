@@ -4,6 +4,36 @@ version = "0.1.0"
 description = "A command-line tool for creating and managing coordinated patch series across multiple Git repositories"
 readme = "README.md"
 requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Pavlo Kostianov", email = "pkostian@redhat.com"}
+]
+keywords = [
+    "git",
+    "patch",
+    "automation",
+    "cli",
+    "repository",
+    "batch-operations",
+    "gerrit",
+    "code-review",
+    "multi-repo",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Environment :: Console",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Software Distribution",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+]
 dependencies = [
     "click>=8.1.0",
 ]
@@ -18,7 +48,20 @@ dev = [
     "ruff>=0.8.0",
     "mypy>=1.13.0",
     "bandit>=1.7.10",
+    "pre-commit>=3.5.0",
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "furo>=2023.0.0",
+    "sphinx-autoapi>=3.0.0",
+    "myst-parser>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/k-pavlo/changes-roller"
+Repository = "https://github.com/k-pavlo/changes-roller"
+Issues = "https://github.com/k-pavlo/changes-roller/issues"
+Documentation = "https://changes-roller.readthedocs.io"
 
 [project.scripts]
 roller = "roller.cli:cli"
