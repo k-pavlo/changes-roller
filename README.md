@@ -28,11 +28,14 @@ Configure once, execute everywhere. You provide the repositories to update and a
 - Apply patches to multiple Git repositories in parallel
 - Custom patch scripts with full repository access
 - Automated Git operations (clone, commit, stage)
+- **Git branch switching** - Apply changes to specific branches (e.g., stable branches)
+- **Custom command execution** - Run commands before/after applying changes
+- **Dry-run mode** - Preview operations without executing them
 - Automatic commit sign-off (Signed-off-by line)
 - Automatic git-review setup for Gerrit integration
 - Commit message templating with variables
 - Gerrit code review integration with topic grouping
-- Optional test execution before committing
+- Optional test execution before committing (e.g., `tox -e pep8`)
 - Clear progress reporting and error handling
 
 ## Installation
@@ -81,6 +84,7 @@ roller create --config-file my-series.ini
 
 ### [SERIE] Section
 
+**Basic Options:**
 - `projects` (required): Comma-separated list of Git repository URLs
 - `commands` (required): Path to executable patch script
 - `commit_msg` (required): Commit message template (supports `{{ project_name }}`)
@@ -88,11 +92,24 @@ roller create --config-file my-series.ini
 - `commit` (optional): Enable automatic commits (default: true)
 - `review` (optional): Enable Gerrit review submission (default: false)
 
+**Branch Switching Options:**
+- `branch` (optional): Target branch to switch to before applying changes
+- `create_branch` (optional): Create branch if it doesn't exist (default: false)
+- `stay_on_branch` (optional): Don't return to original branch after completion (default: false)
+
+**Command Execution Options:**
+- `pre_commands` (optional): Commands to run before applying changes (one per line)
+- `post_commands` (optional): Commands to run after committing (one per line)
+- `continue_on_error` (optional): Continue if commands fail (default: false)
+- `dry_run` (optional): Preview operations without executing (default: false)
+
 ### [TESTS] Section
 
 - `run` (optional): Enable test execution (default: false)
 - `blocking` (optional): Fail if tests fail (default: false)
 - `command` (optional): Test command to run (default: tox)
+
+Example: `command = tox -e pep8` runs PEP8 checks before committing
 
 ## Command-Line Options
 
@@ -117,14 +134,85 @@ Create a new patch series across multiple repositories.
 roller create --config-file <path> [options]
 
 Options:
-  --config-file PATH    Path to configuration file (required)
-  --config-dir PATH     Additional directory for config files
-  -e, --exit-on-error  Exit immediately on first failure
-  -v, --verbose        Enable verbose output
-  --help               Show help message
+  --config-file PATH        Path to configuration file (required)
+  --config-dir PATH         Additional directory for config files
+  -e, --exit-on-error       Exit immediately on first failure
+  -v, --verbose             Enable verbose output
+
+  # Branch switching
+  --branch NAME             Target branch to switch to before applying changes
+  --create-branch           Create branch if it doesn't exist (requires --branch)
+  --stay-on-branch          Don't return to original branch after completion
+
+  # Command execution
+  --pre-command CMD         Command to execute before changes (repeatable)
+  --post-command CMD        Command to execute after changes (repeatable)
+  --continue-on-error       Continue if commands fail instead of stopping
+  --dry-run                 Preview operations without executing them
+
+  --help                    Show help message
 ```
 
 ## Examples
+
+### Basic Usage
+
+```bash
+# Apply patch to multiple repositories
+roller create --config-file my-series.ini
+```
+
+### Branch Switching
+
+```bash
+# Apply changes to a specific branch
+roller create --config-file security-fix.ini --branch stable/2024.2
+
+# Multi-branch backport
+for branch in stable/2024.1 stable/2024.2 stable/2025.1; do
+  roller create --config-file fix.ini --branch $branch
+done
+```
+
+### With Commands
+
+```bash
+# Pull latest before patching, push after committing
+roller create --config-file series.ini \
+  --pre-command "git pull origin main" \
+  --post-command "git push origin main"
+
+# Validate before and after
+roller create --config-file series.ini \
+  --pre-command "pytest tests/" \
+  --post-command "git push"
+```
+
+### Dry Run
+
+```bash
+# Preview what would happen without executing
+roller create --config-file series.ini --dry-run
+```
+
+### With Testing
+
+Configuration file with PEP8 validation:
+
+```ini
+[SERIE]
+projects = https://github.com/org/repo1,
+           https://github.com/org/repo2
+commands = ./my-patch.sh
+commit_msg = Fix styling in {{ project_name }}
+
+[TESTS]
+run = true
+blocking = true
+command = tox -e pep8
+```
+
+### More Examples
 
 See the `examples/` directory for complete examples:
 

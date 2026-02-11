@@ -119,6 +119,9 @@ class TestPatchExecutor:
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
 
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Mock repository instance
         mock_repo = MagicMock()
         mock_repo.name = "repo"
@@ -150,6 +153,9 @@ class TestPatchExecutor:
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
 
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Mock repository instance
         mock_repo = MagicMock()
         mock_repo.name = "repo"
@@ -176,6 +182,9 @@ class TestPatchExecutor:
         )
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         # Mock repository instance
         mock_repo = MagicMock()
@@ -204,6 +213,9 @@ class TestPatchExecutor:
         )
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         # Mock repository instance
         mock_repo = MagicMock()
@@ -237,6 +249,9 @@ class TestPatchExecutor:
         )
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         # Mock repository instance
         mock_repo = MagicMock()
@@ -273,6 +288,9 @@ class TestPatchExecutor:
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
 
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Mock repository instance
         mock_repo = MagicMock()
         mock_repo.name = "repo"
@@ -304,6 +322,9 @@ class TestPatchExecutor:
         )
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         # Mock repository instance
         mock_repo = MagicMock()
@@ -342,6 +363,9 @@ class TestPatchExecutor:
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
 
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Mock repository instance
         mock_repo = MagicMock()
         mock_repo.name = "repo"
@@ -377,6 +401,9 @@ class TestPatchExecutor:
         )
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         # Mock repository instance
         mock_repo = MagicMock()

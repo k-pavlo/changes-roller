@@ -20,6 +20,22 @@ class SeriesConfig:
     run_tests: bool = False
     tests_blocking: bool = False
     test_command: str = ""
+    # Branch switching options
+    branch: str | None = None
+    create_branch: bool = False
+    stay_on_branch: bool = False
+    # Command execution options
+    pre_commands: list[str] = None  # type: ignore
+    post_commands: list[str] = None  # type: ignore
+    continue_on_error: bool = False
+    dry_run: bool = False
+
+    def __post_init__(self) -> None:
+        """Initialize mutable default values."""
+        if self.pre_commands is None:
+            self.pre_commands = []
+        if self.post_commands is None:
+            self.post_commands = []
 
 
 class ConfigParser:
@@ -73,6 +89,25 @@ class ConfigParser:
             tests_blocking = tests.getboolean("blocking", fallback=False)
             test_command = tests.get("command", "tox")
 
+        # Parse branch switching options
+        branch = serie.get("branch", None)
+        create_branch = serie.getboolean("create_branch", fallback=False)
+        stay_on_branch = serie.getboolean("stay_on_branch", fallback=False)
+
+        # Parse command execution options
+        pre_commands_str = serie.get("pre_commands", "")
+        pre_commands = [
+            cmd.strip() for cmd in pre_commands_str.split("\n") if cmd.strip()
+        ]
+
+        post_commands_str = serie.get("post_commands", "")
+        post_commands = [
+            cmd.strip() for cmd in post_commands_str.split("\n") if cmd.strip()
+        ]
+
+        continue_on_error = serie.getboolean("continue_on_error", fallback=False)
+        dry_run = serie.getboolean("dry_run", fallback=False)
+
         return SeriesConfig(
             projects=projects,
             commands=commands,
@@ -83,4 +118,11 @@ class ConfigParser:
             run_tests=run_tests,
             tests_blocking=tests_blocking,
             test_command=test_command,
+            branch=branch,
+            create_branch=create_branch,
+            stay_on_branch=stay_on_branch,
+            pre_commands=pre_commands,
+            post_commands=post_commands,
+            continue_on_error=continue_on_error,
+            dry_run=dry_run,
         )

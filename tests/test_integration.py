@@ -65,6 +65,9 @@ review = false
         reporter = Reporter(verbose=False)
         executor = PatchExecutor(config, reporter)
 
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Process single repository
         success = executor._process_repository(
             config.projects[0], 1, 2, executable_script
@@ -136,6 +139,10 @@ commit = false
         # Execute
         reporter = Reporter(verbose=False)
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
+
         # Don't call full execute() as it requires actual script file validation
         # Instead test the repository processing individually
         for idx, project in enumerate(config.projects):
@@ -251,6 +258,9 @@ commit_msg = Test
 
         reporter = Reporter()
         executor = PatchExecutor(config, reporter)
+
+        # Set workspace path (normally done by execute())
+        executor.workspace.path = temp_dir
 
         success = executor._process_repository(
             config.projects[0], 1, 1, executable_script

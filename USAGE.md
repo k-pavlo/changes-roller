@@ -117,6 +117,13 @@ roller create --config-file series.ini --verbose
 | `topic` | No | "" | Gerrit topic name |
 | `commit` | No | true | Auto-commit changes |
 | `review` | No | false | Submit to Gerrit |
+| `branch` | No | None | Target branch to switch to |
+| `create_branch` | No | false | Create branch if it doesn't exist |
+| `stay_on_branch` | No | false | Don't return to original branch |
+| `pre_commands` | No | [] | Commands to run before changes (one per line) |
+| `post_commands` | No | [] | Commands to run after changes (one per line) |
+| `continue_on_error` | No | false | Continue if commands fail |
+| `dry_run` | No | false | Preview without executing |
 
 ### [TESTS] Section
 
@@ -261,6 +268,102 @@ Default behavior continues processing all repositories even if some fail.
 2. Inspect failed repositories manually
 3. Use `--verbose` for detailed output
 4. Review patch script logic
+
+## Branch Switching
+
+### Using the --branch Option
+
+Apply changes to a specific branch:
+
+```bash
+roller create --config-file series.ini --branch stable/1.x
+```
+
+Create a new branch if it doesn't exist:
+
+```bash
+roller create --config-file series.ini --branch feature/new --create-branch
+```
+
+Stay on the target branch after completion:
+
+```bash
+roller create --config-file series.ini --branch dev --stay-on-branch
+```
+
+### Multi-Branch Backport
+
+Apply the same fix to multiple branches:
+
+```bash
+for branch in main stable/2.x stable/1.x; do
+  roller create --config-file security-fix.ini --branch $branch
+done
+```
+
+## Command Execution
+
+### Pre-Commands
+
+Run commands before applying changes:
+
+```bash
+roller create --config-file series.ini \
+  --pre-command "git pull origin main" \
+  --pre-command "pytest tests/"
+```
+
+### Post-Commands
+
+Run commands after applying changes:
+
+```bash
+roller create --config-file series.ini \
+  --post-command "git add -A" \
+  --post-command "git commit -m 'Auto-commit'" \
+  --post-command "git push"
+```
+
+### Continue on Error
+
+Continue processing even if commands fail:
+
+```bash
+roller create --config-file series.ini \
+  --pre-command "npm test" \
+  --continue-on-error
+```
+
+### Dry Run
+
+Preview what would be executed without making changes:
+
+```bash
+roller create --config-file series.ini --dry-run
+```
+
+### Commands in Configuration File
+
+You can also specify commands in the config file:
+
+```ini
+[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+
+# Commands to run before applying changes
+pre_commands = git checkout main
+               git pull
+               pytest tests/
+
+# Commands to run after applying changes
+post_commands = git add -A
+                git commit -m "Auto-update"
+                git push
+```
+
+**Security Warning**: Commands from configuration files pose a security risk. Only use configuration files from trusted sources, as they can execute arbitrary commands on your system.
 
 ## Examples
 

@@ -88,6 +88,31 @@ commit = true
 # Requires git-review to be installed and configured
 review = false
 
+# Optional: Target branch to switch to before applying changes
+# branch = stable/1.x
+
+# Optional: Create branch if it doesn't exist (default: false)
+# Requires 'branch' to be set
+# create_branch = false
+
+# Optional: Stay on target branch after completion (default: false)
+# By default, returns to original branch
+# stay_on_branch = false
+
+# Optional: Commands to run before applying changes (one per line)
+# WARNING: Commands from config files can be dangerous. Only use trusted configs.
+# pre_commands = git pull origin main
+#                pytest tests/
+
+# Optional: Commands to run after applying changes (one per line)
+# post_commands = git push origin feature-branch
+
+# Optional: Continue processing if commands fail (default: false)
+# continue_on_error = false
+
+# Optional: Preview operations without executing (default: false)
+# dry_run = false
+
 [TESTS]
 # Run tests before committing (default: false)
 run = false
@@ -130,8 +155,53 @@ command = tox
     "-e", "--exit-on-error", is_flag=True, help="Exit immediately on first failure"
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose output")
+@click.option(
+    "--branch",
+    type=str,
+    help="Target branch to switch to before applying changes",
+)
+@click.option(
+    "--create-branch",
+    is_flag=True,
+    help="Create branch if it doesn't exist (requires --branch)",
+)
+@click.option(
+    "--stay-on-branch",
+    is_flag=True,
+    help="Don't return to original branch after completion",
+)
+@click.option(
+    "--pre-command",
+    multiple=True,
+    help="Command to execute before applying changes (repeatable)",
+)
+@click.option(
+    "--post-command",
+    multiple=True,
+    help="Command to execute after applying changes (repeatable)",
+)
+@click.option(
+    "--continue-on-error",
+    is_flag=True,
+    help="Continue if commands fail instead of stopping",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Preview operations without executing them",
+)
 def create(
-    config_file: Path, config_dir: Path, exit_on_error: bool, verbose: bool
+    config_file: Path,
+    config_dir: Path,
+    exit_on_error: bool,
+    verbose: bool,
+    branch: str | None,
+    create_branch: bool,
+    stay_on_branch: bool,
+    pre_command: tuple[str, ...],
+    post_command: tuple[str, ...],
+    continue_on_error: bool,
+    dry_run: bool,
 ) -> None:
     """
     Create a new patch series across multiple repositories.
@@ -142,11 +212,38 @@ def create(
 
     Example:
         roller create --config-file my-series.ini
+        roller create --config-file my-series.ini --branch stable/1.x
+        roller create --config-file my-series.ini --pre-command "git pull" --post-command "git push"
     """
     try:
+        # Validate options
+        if create_branch and not branch:
+            click.echo(
+                "Error: --create-branch requires --branch to be specified", err=True
+            )
+            sys.exit(1)
+
         # Parse configuration
         parser = ConfigParser(config_file)
         config = parser.parse()
+
+        # Override config with CLI options
+        if branch is not None:
+            config.branch = branch
+        if create_branch:
+            config.create_branch = True
+        if stay_on_branch:
+            config.stay_on_branch = True
+        if pre_command:
+            # CLI pre-commands are added to config file pre-commands
+            config.pre_commands = list(pre_command) + config.pre_commands
+        if post_command:
+            # CLI post-commands are added to config file post-commands
+            config.post_commands = list(post_command) + config.post_commands
+        if continue_on_error:
+            config.continue_on_error = True
+        if dry_run:
+            config.dry_run = True
 
         # Create reporter
         reporter = Reporter(verbose=verbose)

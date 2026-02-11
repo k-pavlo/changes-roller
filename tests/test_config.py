@@ -200,3 +200,139 @@ class TestSeriesConfig:
         assert sample_series_config.run_tests is True
         assert sample_series_config.tests_blocking is False
         assert sample_series_config.test_command == "pytest"
+
+    def test_series_config_default_lists(self):
+        """Test that pre_commands and post_commands default to empty lists."""
+        config = SeriesConfig(
+            projects=["https://github.com/org/repo.git"],
+            commands="./patch.sh",
+            commit_msg="Test commit",
+        )
+
+        assert config.pre_commands == []
+        assert config.post_commands == []
+
+    def test_parse_branch_options(self, temp_dir: Path):
+        """Test parsing branch switching options."""
+        config_path = temp_dir / "branch.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+branch = stable/1.x
+create_branch = true
+stay_on_branch = yes
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert config.branch == "stable/1.x"
+        assert config.create_branch is True
+        assert config.stay_on_branch is True
+
+    def test_parse_pre_commands(self, temp_dir: Path):
+        """Test parsing pre-commands from config file."""
+        config_path = temp_dir / "pre_cmd.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+pre_commands = git pull origin main
+               pytest tests/
+               echo "Ready"
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert len(config.pre_commands) == 3
+        assert config.pre_commands[0] == "git pull origin main"
+        assert config.pre_commands[1] == "pytest tests/"
+        assert config.pre_commands[2] == 'echo "Ready"'
+
+    def test_parse_post_commands(self, temp_dir: Path):
+        """Test parsing post-commands from config file."""
+        config_path = temp_dir / "post_cmd.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+post_commands = git add -A
+                git commit -m "Auto-commit"
+                git push
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert len(config.post_commands) == 3
+        assert config.post_commands[0] == "git add -A"
+        assert config.post_commands[1] == 'git commit -m "Auto-commit"'
+        assert config.post_commands[2] == "git push"
+
+    def test_parse_empty_pre_commands(self, temp_dir: Path):
+        """Test parsing empty pre_commands."""
+        config_path = temp_dir / "empty_pre.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+pre_commands =
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert config.pre_commands == []
+
+    def test_parse_continue_on_error(self, temp_dir: Path):
+        """Test parsing continue_on_error option."""
+        config_path = temp_dir / "continue.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+continue_on_error = true
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert config.continue_on_error is True
+
+    def test_parse_dry_run(self, temp_dir: Path):
+        """Test parsing dry_run option."""
+        config_path = temp_dir / "dry_run.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+dry_run = yes
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert config.dry_run is True
+
+    def test_parse_all_new_options(self, temp_dir: Path):
+        """Test parsing all new options together."""
+        config_path = temp_dir / "all_new.ini"
+        config_path.write_text("""[SERIE]
+projects = https://github.com/org/repo.git
+commands = ./patch.sh
+commit_msg = Test
+branch = feature/new
+create_branch = yes
+stay_on_branch = no
+pre_commands = echo "Starting"
+               git status
+post_commands = echo "Done"
+continue_on_error = false
+dry_run = true
+""")
+        parser = ConfigParser(config_path)
+        config = parser.parse()
+
+        assert config.branch == "feature/new"
+        assert config.create_branch is True
+        assert config.stay_on_branch is False
+        assert len(config.pre_commands) == 2
+        assert len(config.post_commands) == 1
+        assert config.continue_on_error is False
+        assert config.dry_run is True

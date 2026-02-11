@@ -277,3 +277,188 @@ class TestRepository:
         assert success is False
         assert stdout == ""
         assert "Unexpected error" in stderr
+
+    @patch("subprocess.run")
+    def test_get_current_branch_success(self, mock_run, temp_dir: Path):
+        """Test getting current branch name."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="main\n")
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        branch = repo.get_current_branch()
+
+        assert branch == "main"
+        call_args = mock_run.call_args
+        assert call_args[0][0] == ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+        assert call_args[1]["cwd"] == repo.path
+
+    @patch("subprocess.run")
+    def test_get_current_branch_detached_head(self, mock_run, temp_dir: Path):
+        """Test getting current branch in detached HEAD state."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="HEAD\n")
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        branch = repo.get_current_branch()
+
+        assert branch == ""
+
+    @patch("subprocess.run")
+    def test_get_current_branch_failure(self, mock_run, temp_dir: Path):
+        """Test failed to get current branch."""
+        mock_run.side_effect = subprocess.CalledProcessError(
+            1, "git rev-parse", stderr="fatal: not a git repository"
+        )
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        with pytest.raises(RepositoryError, match="Failed to get current branch"):
+            repo.get_current_branch()
+
+    @patch("subprocess.run")
+    def test_branch_exists_local(self, mock_run, temp_dir: Path):
+        """Test checking if branch exists locally."""
+        mock_run.return_value = MagicMock(returncode=0)
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.branch_exists("feature-branch")
+
+        assert result is True
+        call_args = mock_run.call_args
+        assert call_args[0][0] == ["git", "show-ref", "--verify", "refs/heads/feature-branch"]
+
+    @patch("subprocess.run")
+    def test_branch_exists_remote(self, mock_run, temp_dir: Path):
+        """Test checking if branch exists remotely."""
+        # First call returns non-zero (not local), second returns 0 (found remote)
+        mock_run.side_effect = [
+            MagicMock(returncode=1),
+            MagicMock(returncode=0),
+        ]
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.branch_exists("feature-branch")
+
+        assert result is True
+        assert mock_run.call_count == 2
+
+    @patch("subprocess.run")
+    def test_branch_exists_not_found(self, mock_run, temp_dir: Path):
+        """Test checking if branch does not exist."""
+        mock_run.return_value = MagicMock(returncode=1)
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.branch_exists("nonexistent-branch")
+
+        assert result is False
+
+    @patch("subprocess.run")
+    def test_create_branch_success(self, mock_run, temp_dir: Path):
+        """Test creating a new branch."""
+        mock_run.return_value = MagicMock(returncode=0)
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.create_branch("new-branch")
+
+        assert result is True
+        call_args = mock_run.call_args
+        assert call_args[0][0] == ["git", "checkout", "-b", "new-branch"]
+        assert call_args[1]["cwd"] == repo.path
+
+    @patch("subprocess.run")
+    def test_create_branch_failure(self, mock_run, temp_dir: Path):
+        """Test failed branch creation."""
+        mock_run.side_effect = subprocess.CalledProcessError(
+            1, "git checkout -b", stderr="fatal: branch already exists"
+        )
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        with pytest.raises(RepositoryError, match="Failed to create branch"):
+            repo.create_branch("existing-branch")
+
+    @patch("subprocess.run")
+    def test_branch_exists_locally_true(self, mock_run, temp_dir: Path):
+        """Test checking if branch exists locally."""
+        mock_run.return_value = MagicMock(returncode=0)
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.branch_exists_locally("feature-branch")
+
+        assert result is True
+        call_args = mock_run.call_args
+        assert call_args[0][0] == ["git", "show-ref", "--verify", "refs/heads/feature-branch"]
+
+    @patch("subprocess.run")
+    def test_branch_exists_locally_false(self, mock_run, temp_dir: Path):
+        """Test checking if branch doesn't exist locally."""
+        mock_run.return_value = MagicMock(returncode=1)
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.branch_exists_locally("nonexistent-branch")
+
+        assert result is False
+
+    @patch("subprocess.run")
+    def test_checkout_branch_local_exists(self, mock_run, temp_dir: Path):
+        """Test switching to an existing local branch."""
+        # First call checks if branch exists locally (returns 0 = exists)
+        # Second call checks out the branch
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # branch_exists_locally
+            MagicMock(returncode=0),  # git checkout
+        ]
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.checkout_branch("feature-branch")
+
+        assert result is True
+        assert mock_run.call_count == 2
+        # Second call should be git checkout
+        checkout_call = mock_run.call_args_list[1]
+        assert checkout_call[0][0] == ["git", "checkout", "feature-branch"]
+        assert checkout_call[1]["cwd"] == repo.path
+
+    @patch("subprocess.run")
+    def test_checkout_branch_remote_only(self, mock_run, temp_dir: Path):
+        """Test switching to a branch that only exists remotely."""
+        # First call checks if branch exists locally (returns 1 = doesn't exist)
+        # Second call creates tracking branch from origin
+        mock_run.side_effect = [
+            MagicMock(returncode=1),  # branch_exists_locally
+            MagicMock(returncode=0),  # git checkout -b
+        ]
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.checkout_branch("remote-branch")
+
+        assert result is True
+        assert mock_run.call_count == 2
+        # Second call should create tracking branch
+        checkout_call = mock_run.call_args_list[1]
+        assert checkout_call[0][0] == ["git", "checkout", "-b", "remote-branch", "origin/remote-branch"]
+        assert checkout_call[1]["cwd"] == repo.path
+
+    @patch("subprocess.run")
+    def test_checkout_branch_failure(self, mock_run, temp_dir: Path):
+        """Test failed branch checkout when branch doesn't exist anywhere."""
+        # First call checks if branch exists locally (returns 1 = doesn't exist)
+        # Second call tries to create tracking branch from origin (fails)
+        mock_run.side_effect = [
+            MagicMock(returncode=1),  # branch_exists_locally
+            subprocess.CalledProcessError(
+                1, "git checkout", stderr="error: pathspec 'origin/nonexistent' did not match"
+            ),
+        ]
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        with pytest.raises(RepositoryError, match="Failed to checkout branch"):
+            repo.checkout_branch("nonexistent")
+
+    @patch("subprocess.run")
+    def test_has_uncommitted_changes(self, mock_run, temp_dir: Path):
+        """Test checking for uncommitted changes."""
+        mock_run.return_value = MagicMock(
+            returncode=0, stdout=" M file.txt\n"
+        )
+        repo = Repository("https://github.com/org/test-repo.git", temp_dir)
+
+        result = repo.has_uncommitted_changes()
+
+        assert result is True

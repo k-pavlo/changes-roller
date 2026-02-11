@@ -119,6 +119,15 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 - `topic`: Code review topic name (optional)
 - `commit`: Enable/disable automatic commits (boolean)
 - `review`: Enable/disable review submission (boolean)
+- Branch switching options:
+  - `branch`: Target branch to switch to before applying changes (optional)
+  - `create_branch`: Create branch if it doesn't exist (boolean, optional)
+  - `stay_on_branch`: Don't return to original branch (boolean, optional)
+- Command execution options:
+  - `pre_commands`: Commands to execute before applying changes (list, optional)
+  - `post_commands`: Commands to execute after applying changes (list, optional)
+  - `continue_on_error`: Continue if commands fail (boolean, optional)
+  - `dry_run`: Preview operations without executing (boolean, optional)
 - Testing options:
   - `run_tests`: Enable/disable test execution (boolean)
   - `tests_blocking`: Whether test failures should block patching (boolean)
@@ -310,6 +319,12 @@ Summary:
 - Use SSH keys or credential managers for Git authentication
 - Validate and sanitize user-provided scripts before execution
 - Isolate execution environments to prevent script interference
+- **Command Execution Security**:
+  - Commands from configuration files can execute arbitrary code
+  - Only use configuration files from trusted sources
+  - CLI-provided commands (`--pre-command`, `--post-command`) are safer as the user controls them directly
+  - Consider using `--dry-run` to preview commands before execution
+  - Commands run in the repository directory with full shell access
 
 ## Success Criteria
 
@@ -374,3 +389,18 @@ Migrate from deprecated API to new version:
 - Patch script runs find-replace for API methods
 - Run extensive test suite (blocking)
 - Submit for manual code review before merge
+
+### Use Case 4: Multi-Branch Backport
+Apply security fix to multiple stable branches:
+- Apply same fix to main, stable/2.x, and stable/1.x
+- Use `--branch` option to target each branch
+- Ensure tests pass on all branches before committing
+- Automated workflow for consistent backporting
+
+### Use Case 5: Automated Workflow with Custom Commands
+Complete automation from checkout to push:
+- Pre-commands: checkout branch, pull latest changes, run validation
+- Apply patch script for configuration updates
+- Post-commands: run tests, commit changes, push to remote
+- Use `--dry-run` to preview the entire workflow first
+- Use `--continue-on-error` for non-critical command failures
