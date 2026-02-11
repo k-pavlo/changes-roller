@@ -230,11 +230,23 @@ pip install -e ".[dev]"
 pytest
 
 # Format code
-black roller/
+ruff format .
+
+# Linting
+ruff check .
 
 # Type checking
 mypy roller/
 ```
+
+## Contributing
+
+We welcome contributions! Please see our contributing guidelines and community standards:
+
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup, code standards, and PR process
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community standards and expectations
+- **[Changelog](CHANGELOG.md)** - Release history and version changes
+- **[Security Policy](SECURITY.md)** - Reporting issues and safe usage guidelines
 
 ## License
 
