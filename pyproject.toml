@@ -3,7 +3,7 @@ name = "changes-roller"
 version = "0.1.0"
 description = "A command-line tool for creating and managing coordinated patch series across multiple Git repositories"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
     {name = "Pavlo Kostianov", email = "pkostian@redhat.com"}
@@ -25,7 +25,10 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
     "Environment :: Console",
     "Topic :: Software Development :: Version Control :: Git",
@@ -105,7 +108,7 @@ exclude_lines = [
 # Ruff configuration
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
@@ -136,7 +139,7 @@ indent-style = "space"
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
