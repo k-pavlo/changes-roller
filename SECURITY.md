@@ -17,6 +17,7 @@ If you discover a concern with this project, please report it responsibly.
 Please send details to: **pasha.k460@gmail.com**
 
 Include in your report:
+
 - Description of the concern
 - Steps to reproduce the issue
 - Affected versions
@@ -51,6 +52,7 @@ When using changes-roller:
 ### Command Execution
 
 This tool executes shell commands as part of its core functionality:
+
 - Patch scripts specified in configuration
 - Git operations on repositories
 - Optional pre/post commands
@@ -61,6 +63,7 @@ This tool executes shell commands as part of its core functionality:
 ### Git Credentials
 
 The tool uses your system's Git configuration and credentials. Ensure:
+
 - Git credentials are properly secured
 - Repository access is appropriately scoped
 - SSH keys or tokens follow your organization's policies

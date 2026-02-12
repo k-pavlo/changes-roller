@@ -48,6 +48,7 @@ sed -i 's/old_value/new_value/g' config.yml
 ```
 
 Make it executable:
+
 ```bash
 chmod +x patch.sh
 ```
@@ -109,29 +110,29 @@ roller create --config-file series.ini --verbose
 
 ### [SERIE] Section
 
-| Option | Required | Default | Description |
-|--------|----------|---------|-------------|
-| `projects` | Yes | - | Comma-separated Git repository URLs |
-| `commands` | Yes | - | Path to patch script |
-| `commit_msg` | Yes | - | Commit message template |
-| `topic` | No | "" | Gerrit topic name |
-| `commit` | No | true | Auto-commit changes |
-| `review` | No | false | Submit to Gerrit |
-| `branch` | No | None | Target branch to switch to |
-| `create_branch` | No | false | Create branch if it doesn't exist |
-| `stay_on_branch` | No | false | Don't return to original branch |
-| `pre_commands` | No | [] | Commands to run before changes (one per line) |
-| `post_commands` | No | [] | Commands to run after changes (one per line) |
-| `continue_on_error` | No | false | Continue if commands fail |
-| `dry_run` | No | false | Preview without executing |
+| Option              | Required | Default | Description                                   |
+| ------------------- | -------- | ------- | --------------------------------------------- |
+| `projects`          | Yes      | -       | Comma-separated Git repository URLs           |
+| `commands`          | Yes      | -       | Path to patch script                          |
+| `commit_msg`        | Yes      | -       | Commit message template                       |
+| `topic`             | No       | ""      | Gerrit topic name                             |
+| `commit`            | No       | true    | Auto-commit changes                           |
+| `review`            | No       | false   | Submit to Gerrit                              |
+| `branch`            | No       | None    | Target branch to switch to                    |
+| `create_branch`     | No       | false   | Create branch if it doesn't exist             |
+| `stay_on_branch`    | No       | false   | Don't return to original branch               |
+| `pre_commands`      | No       | []      | Commands to run before changes (one per line) |
+| `post_commands`     | No       | []      | Commands to run after changes (one per line)  |
+| `continue_on_error` | No       | false   | Continue if commands fail                     |
+| `dry_run`           | No       | false   | Preview without executing                     |
 
 ### [TESTS] Section
 
-| Option | Required | Default | Description |
-|--------|----------|---------|-------------|
-| `run` | No | false | Enable test execution |
-| `blocking` | No | false | Fail on test failure |
-| `command` | No | tox | Test command to run |
+| Option     | Required | Default | Description           |
+| ---------- | -------- | ------- | --------------------- |
+| `run`      | No       | false   | Enable test execution |
+| `blocking` | No       | false   | Fail on test failure  |
+| `command`  | No       | tox     | Test command to run   |
 
 ## Template Variables
 
@@ -141,6 +142,7 @@ The following variables can be used in `commit_msg`:
 - `{{project_name}}` - Alternative syntax without spaces
 
 Example:
+
 ```ini
 commit_msg = Update {{ project_name }} dependencies
 
@@ -199,6 +201,7 @@ command = pytest tests/
 ### Test Commands
 
 Common test commands:
+
 - `tox` - Run tox environments
 - `pytest` - Run pytest
 - `npm test` - Node.js tests
@@ -208,11 +211,13 @@ Common test commands:
 ### Blocking vs Non-Blocking
 
 **Blocking** (`blocking = true`):
+
 - Tests must pass for commit to be created
 - Repository is marked as failed if tests fail
 - Use for critical changes
 
 **Non-Blocking** (`blocking = false`):
+
 - Tests run but failures are warnings
 - Commit is created even if tests fail
 - Use for experimental changes
@@ -222,6 +227,7 @@ Common test commands:
 ### Setup
 
 1. Install git-review:
+
 ```bash
 pip install git-review
 ```
@@ -229,6 +235,7 @@ pip install git-review
 2. Configure your repositories with `.gitreview` file
 
 3. Enable review submission:
+
 ```ini
 [SERIE]
 review = true
@@ -245,6 +252,7 @@ topic = my-patch-series
 6. Review and merge through Gerrit UI
 
 **Notes**:
+
 - The tool automatically sets up git-review for each repository by running `git review -s` after cloning. This ensures the Gerrit remote is properly configured before submitting patches.
 - All commits are automatically signed off using `git commit -s`, which adds a "Signed-off-by" line with your Git user name and email to the commit message.
 
@@ -423,19 +431,23 @@ review = false
 ### Common Issues
 
 **Script not executable**
+
 ```bash
 chmod +x your_script.sh
 ```
 
 **Git authentication fails**
+
 - Use SSH URLs with configured keys
 - Or use HTTPS with credential helper
 
 **No changes detected**
+
 - Verify your script makes actual file changes
 - Check script runs without errors
 
 **Tests timeout**
+
 - Increase timeout in repository.py
 - Or disable blocking tests
 
@@ -450,6 +462,7 @@ The tool automatically processes repositories in parallel (up to 4 concurrent wo
 Workspaces are created in `/tmp/changes-roller-XXXXXX` by default. The workspace path is displayed at the start of execution.
 
 To inspect a workspace after execution:
+
 ```bash
 cd /tmp/changes-roller-abc123/repo-name
 git log

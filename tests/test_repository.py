@@ -322,7 +322,12 @@ class TestRepository:
 
         assert result is True
         call_args = mock_run.call_args
-        assert call_args[0][0] == ["git", "show-ref", "--verify", "refs/heads/feature-branch"]
+        assert call_args[0][0] == [
+            "git",
+            "show-ref",
+            "--verify",
+            "refs/heads/feature-branch",
+        ]
 
     @patch("subprocess.run")
     def test_branch_exists_remote(self, mock_run, temp_dir: Path):
@@ -383,7 +388,12 @@ class TestRepository:
 
         assert result is True
         call_args = mock_run.call_args
-        assert call_args[0][0] == ["git", "show-ref", "--verify", "refs/heads/feature-branch"]
+        assert call_args[0][0] == [
+            "git",
+            "show-ref",
+            "--verify",
+            "refs/heads/feature-branch",
+        ]
 
     @patch("subprocess.run")
     def test_branch_exists_locally_false(self, mock_run, temp_dir: Path):
@@ -432,7 +442,13 @@ class TestRepository:
         assert mock_run.call_count == 2
         # Second call should create tracking branch
         checkout_call = mock_run.call_args_list[1]
-        assert checkout_call[0][0] == ["git", "checkout", "-b", "remote-branch", "origin/remote-branch"]
+        assert checkout_call[0][0] == [
+            "git",
+            "checkout",
+            "-b",
+            "remote-branch",
+            "origin/remote-branch",
+        ]
         assert checkout_call[1]["cwd"] == repo.path
 
     @patch("subprocess.run")
@@ -443,7 +459,9 @@ class TestRepository:
         mock_run.side_effect = [
             MagicMock(returncode=1),  # branch_exists_locally
             subprocess.CalledProcessError(
-                1, "git checkout", stderr="error: pathspec 'origin/nonexistent' did not match"
+                1,
+                "git checkout",
+                stderr="error: pathspec 'origin/nonexistent' did not match",
             ),
         ]
         repo = Repository("https://github.com/org/test-repo.git", temp_dir)
@@ -454,9 +472,7 @@ class TestRepository:
     @patch("subprocess.run")
     def test_has_uncommitted_changes(self, mock_run, temp_dir: Path):
         """Test checking for uncommitted changes."""
-        mock_run.return_value = MagicMock(
-            returncode=0, stdout=" M file.txt\n"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout=" M file.txt\n")
         repo = Repository("https://github.com/org/test-repo.git", temp_dir)
 
         result = repo.has_uncommitted_changes()

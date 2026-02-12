@@ -17,6 +17,7 @@ It's Tuesday morning, and you've just discovered a critical security vulnerabili
 changes-roller transforms this soul-crushing routine into a five-minute automation. Write your patch script once, then watch as it executes across all repositories in parallel. What used to consume your entire afternoon now runs while you grab coffee—with consistent changes, uniform commit messages, and organized code reviews.
 
 **Perfect for:**
+
 - Security updates across multiple microservices
 - Dependency upgrades throughout your service ecosystem
 - API migrations affecting client libraries
@@ -62,11 +63,13 @@ pip install .
 ## Quick Start
 
 1. Generate a configuration file:
+
 ```bash
 roller init --output my-series.ini
 ```
 
 2. Create a patch script (`my_patch.sh`):
+
 ```bash
 #!/bin/bash
 # Example: Update a dependency version
@@ -75,12 +78,14 @@ chmod +x my_patch.sh
 ```
 
 3. Edit the configuration file to specify your repositories and patch script:
+
 ```bash
 nano my-series.ini
 # Update the 'projects' list and 'commands' path
 ```
 
 4. Run the patch series:
+
 ```bash
 roller create --config-file my-series.ini
 ```
@@ -90,6 +95,7 @@ roller create --config-file my-series.ini
 ### [SERIE] Section
 
 **Basic Options:**
+
 - `projects` (required): Comma-separated list of Git repository URLs
 - `commands` (required): Path to executable patch script
 - `commit_msg` (required): Commit message template (supports `{{ project_name }}`)
@@ -98,11 +104,13 @@ roller create --config-file my-series.ini
 - `review` (optional): Enable Gerrit review submission (default: false)
 
 **Branch Switching Options:**
+
 - `branch` (optional): Target branch to switch to before applying changes
 - `create_branch` (optional): Create branch if it doesn't exist (default: false)
 - `stay_on_branch` (optional): Don't return to original branch after completion (default: false)
 
 **Command Execution Options:**
+
 - `pre_commands` (optional): Commands to run before applying changes (one per line)
 - `post_commands` (optional): Commands to run after committing (one per line)
 - `continue_on_error` (optional): Continue if commands fail (default: false)

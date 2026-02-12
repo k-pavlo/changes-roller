@@ -93,7 +93,9 @@ class PatchExecutor:
         try:
             # Clone repository
             if self.config.dry_run:
-                self.reporter.print_step(Status.INFO, "[DRY RUN] Would clone repository")
+                self.reporter.print_step(
+                    Status.INFO, "[DRY RUN] Would clone repository"
+                )
             else:
                 repo.clone()
                 self.reporter.print_step(Status.SUCCESS, "Cloned repository")
@@ -107,7 +109,8 @@ class PatchExecutor:
             if self.config.branch:
                 if self.config.dry_run:
                     self.reporter.print_step(
-                        Status.INFO, f"[DRY RUN] Would switch to branch '{self.config.branch}'"
+                        Status.INFO,
+                        f"[DRY RUN] Would switch to branch '{self.config.branch}'",
                     )
                 else:
                     original_branch = repo.get_current_branch()
@@ -132,7 +135,8 @@ class PatchExecutor:
                     elif self.config.create_branch:
                         repo.create_branch(self.config.branch)
                         self.reporter.print_step(
-                            Status.SUCCESS, f"Created and switched to branch '{self.config.branch}'"
+                            Status.SUCCESS,
+                            f"Created and switched to branch '{self.config.branch}'",
                         )
                     else:
                         raise RepositoryError(
@@ -148,12 +152,14 @@ class PatchExecutor:
                             Status.INFO, f"[DRY RUN] Would run pre-command: {cmd}"
                         )
                     else:
-                        if not self._execute_command(repo, cmd, "pre-command"):
-                            if not self.config.continue_on_error:
-                                self.reporter.add_result(
-                                    repo.name, "failed", f"Pre-command failed: {cmd}"
-                                )
-                                return False
+                        if (
+                            not self._execute_command(repo, cmd, "pre-command")
+                            and not self.config.continue_on_error
+                        ):
+                            self.reporter.add_result(
+                                repo.name, "failed", f"Pre-command failed: {cmd}"
+                            )
+                            return False
 
             # Execute patch script
             if self.config.dry_run:
@@ -176,17 +182,17 @@ class PatchExecutor:
                 self.reporter.print_step(Status.SUCCESS, "Executed patch script")
 
             # Check for changes
-            if not self.config.dry_run:
-                if not repo.has_changes():
-                    self.reporter.print_step(Status.INFO, "No changes detected, skipping")
-                    self.reporter.add_result(repo.name, "skipped", "No changes")
-                    return True
+            if not self.config.dry_run and not repo.has_changes():
+                self.reporter.print_step(Status.INFO, "No changes detected, skipping")
+                self.reporter.add_result(repo.name, "skipped", "No changes")
+                return True
 
             # Run tests if configured
             if self.config.run_tests:
                 if self.config.dry_run:
                     self.reporter.print_step(
-                        Status.INFO, f"[DRY RUN] Would run tests: {self.config.test_command}"
+                        Status.INFO,
+                        f"[DRY RUN] Would run tests: {self.config.test_command}",
                     )
                 else:
                     self.reporter.print_step(
@@ -245,12 +251,14 @@ class PatchExecutor:
                             Status.INFO, f"[DRY RUN] Would run post-command: {cmd}"
                         )
                     else:
-                        if not self._execute_command(repo, cmd, "post-command"):
-                            if not self.config.continue_on_error:
-                                self.reporter.add_result(
-                                    repo.name, "failed", f"Post-command failed: {cmd}"
-                                )
-                                return False
+                        if (
+                            not self._execute_command(repo, cmd, "post-command")
+                            and not self.config.continue_on_error
+                        ):
+                            self.reporter.add_result(
+                                repo.name, "failed", f"Post-command failed: {cmd}"
+                            )
+                            return False
 
             # Return to original branch if needed
             if (
@@ -260,7 +268,8 @@ class PatchExecutor:
             ):
                 if self.config.dry_run:
                     self.reporter.print_step(
-                        Status.INFO, f"[DRY RUN] Would return to branch '{original_branch}'"
+                        Status.INFO,
+                        f"[DRY RUN] Would return to branch '{original_branch}'",
                     )
                 else:
                     repo.checkout_branch(original_branch)
@@ -299,12 +308,16 @@ class PatchExecutor:
         success, stdout, stderr = repo.run_command(command)
 
         if success:
-            self.reporter.print_step(Status.SUCCESS, f"{command_type.capitalize()} succeeded")
+            self.reporter.print_step(
+                Status.SUCCESS, f"{command_type.capitalize()} succeeded"
+            )
             if stdout.strip():
                 for line in stdout.strip().split("\n")[:10]:  # Show first 10 lines
                     self.reporter.print_step(Status.INFO, line, indent=4)
         else:
-            self.reporter.print_step(Status.FAILED, f"{command_type.capitalize()} failed")
+            self.reporter.print_step(
+                Status.FAILED, f"{command_type.capitalize()} failed"
+            )
             if stderr.strip():
                 for line in stderr.strip().split("\n")[:10]:  # Show first 10 lines
                     self.reporter.print_step(Status.INFO, f"Error: {line}", indent=4)

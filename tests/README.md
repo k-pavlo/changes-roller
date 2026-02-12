@@ -20,36 +20,43 @@ tests/
 ## Running Tests
 
 ### Run all tests
+
 ```bash
 pytest
 ```
 
 ### Run with verbose output
+
 ```bash
 pytest -v
 ```
 
 ### Run specific test file
+
 ```bash
 pytest tests/test_config.py
 ```
 
 ### Run specific test
+
 ```bash
 pytest tests/test_config.py::TestConfigParser::test_parse_valid_config
 ```
 
 ### Run with coverage report
+
 ```bash
 pytest --cov=roller --cov-report=html
 ```
 
 ### Run only unit tests
+
 ```bash
 pytest -m unit
 ```
 
 ### Run only integration tests
+
 ```bash
 pytest -m integration
 ```
@@ -72,6 +79,7 @@ The project maintains comprehensive test coverage across all modules. Some modul
 ## Test Categories
 
 ### Unit Tests
+
 - **test_config.py**: Tests configuration file parsing, validation, and error handling
 - **test_workspace.py**: Tests workspace creation, cleanup, and path management
 - **test_reporter.py**: Tests output formatting and result tracking
@@ -80,6 +88,7 @@ The project maintains comprehensive test coverage across all modules. Some modul
 - **test_cli.py**: Tests CLI commands with mocked dependencies
 
 ### Integration Tests
+
 - **test_integration.py**: End-to-end workflow tests with full component integration
 
 ## Key Fixtures
@@ -96,11 +105,13 @@ Defined in `conftest.py`:
 ## Writing New Tests
 
 ### Test Naming Convention
+
 - Test files: `test_<module>.py`
 - Test classes: `Test<ClassName>`
 - Test methods: `test_<what_is_being_tested>`
 
 ### Example Test
+
 ```python
 def test_parse_valid_config(config_file: Path):
     """Test parsing a valid configuration file."""
@@ -112,6 +123,7 @@ def test_parse_valid_config(config_file: Path):
 ```
 
 ### Using Mocks
+
 ```python
 @patch('roller.executor.Repository')
 def test_process_repository(mock_repo_class):
@@ -126,6 +138,7 @@ def test_process_repository(mock_repo_class):
 ## Continuous Integration
 
 Tests are configured to run automatically on:
+
 - Every push to the repository
 - Every pull request
 - Coverage reports are generated and tracked
@@ -133,6 +146,7 @@ Tests are configured to run automatically on:
 ## Requirements
 
 Test dependencies are defined in `pyproject.toml`:
+
 ```toml
 [project.optional-dependencies]
 test = [
@@ -143,6 +157,7 @@ test = [
 ```
 
 Install test dependencies:
+
 ```bash
 pip install -e ".[test]"
 ```

@@ -16,6 +16,7 @@ Software organizations often need to apply the same changes across multiple rela
 ## Goals and Objectives
 
 ### Primary Goals
+
 1. Enable bulk patching of multiple Git repositories from a single command
 2. Automate repetitive Git operations (clone, commit, stage)
 3. Ensure consistency of changes and commit messages across all projects
@@ -23,6 +24,7 @@ Software organizations often need to apply the same changes across multiple rela
 5. Provide clear feedback on success/failure for each repository
 
 ### Non-Goals
+
 - Not a version control system replacement
 - Not a patch management system for tracking patch state over time
 - Not a code review platform (integrates with existing ones)
@@ -34,6 +36,7 @@ Software organizations often need to apply the same changes across multiple rela
 **Requirement**: Support patching an arbitrary number of Git repositories in a single execution.
 
 **Details**:
+
 - User provides a list of Git repository URLs
 - Tool clones each repository to a temporary workspace
 - Each repository is processed independently
@@ -44,12 +47,14 @@ Software organizations often need to apply the same changes across multiple rela
 **Requirement**: Allow users to define arbitrary change logic via shell scripts.
 
 **Details**:
+
 - User provides a path to an executable script
 - Script is executed in the context of each cloned repository
 - Script has full access to repository files and can make any changes
 - Script exit codes determine success/failure
 
 **Use Cases**:
+
 - Find-and-replace operations (sed, awk)
 - File additions or deletions
 - Code generation or template updates
@@ -61,6 +66,7 @@ Software organizations often need to apply the same changes across multiple rela
 **Requirement**: Automatically handle Git operations for modified repositories.
 
 **Details**:
+
 - Detect changes made by the patch script (git status)
 - Stage all changes (git add)
 - Create commits with user-specified messages
@@ -72,11 +78,13 @@ Software organizations often need to apply the same changes across multiple rela
 **Requirement**: Support dynamic commit messages with variable substitution.
 
 **Details**:
+
 - Allow template variables in commit messages (e.g., `{{ project_name }}`)
 - Substitute variables at runtime for each repository
 - Support multi-line commit messages
 
 **Example**:
+
 ```
 Update dependencies in {{ project_name }}
 
@@ -88,6 +96,7 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 **Requirement**: Integrate with Gerrit (or similar code review systems).
 
 **Details**:
+
 - Support assigning topics to group related patches
 - Submit patches for review with a single command
 - Allow dry-run mode (commit locally but don't submit)
@@ -98,6 +107,7 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 **Requirement**: Optionally run tests before committing or submitting patches.
 
 **Details**:
+
 - Support running test frameworks (tox, pytest, etc.)
 - Configurable test execution per series
 - Blocking mode: fail the patch if tests fail
@@ -108,11 +118,13 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 **Requirement**: Use configuration files to define patch series.
 
 **Details**:
+
 - Support standard configuration file formats (INI, YAML, or similar)
 - Allow configuration via file and/or command-line arguments
 - Configuration should be reusable and version-controllable
 
 **Required Configuration Options**:
+
 - `projects`: List of Git repository URLs or paths
 - `commands`: Path to patch script file
 - `commit_msg`: Commit message template
@@ -137,6 +149,7 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 **Requirement**: Provide clear feedback and handle failures gracefully.
 
 **Details**:
+
 - Display progress for each repository being processed
 - Report success/failure status for each operation
 - Support fail-fast mode (exit on first error)
@@ -148,6 +161,7 @@ Bump hacking library to version 4.0.0 for improved Python 3.9 support.
 **Requirement**: Manage temporary workspaces for cloning and patching.
 
 **Details**:
+
 - Create isolated workspace directories for each series execution
 - Prevent conflicts between concurrent executions
 - Optionally clean up workspace after completion
@@ -166,19 +180,23 @@ roller <command> [options]
 ### Commands
 
 #### `create`
+
 Create a new patch series across multiple repositories.
 
 **Usage**:
+
 ```bash
 roller create --config-file <path> [--exit-on-error]
 ```
 
 **Options**:
+
 - `--config-file <path>`: Path to configuration file (required)
 - `--config-dir <path>`: Additional directory for config files (optional)
 - `-e, --exit-on-error`: Exit immediately on first failure (optional)
 
 **Behavior**:
+
 1. Read configuration file
 2. Create temporary workspace
 3. For each project:
@@ -191,14 +209,17 @@ roller create --config-file <path> [--exit-on-error]
 4. Display summary of results
 
 #### `update` (Future)
+
 Update an existing patch series (e.g., after code review feedback).
 
 **Usage**:
+
 ```bash
 roller update --config-file <path>
 ```
 
 **Behavior**:
+
 - Locate existing workspace or clones
 - Re-apply updated patch script
 - Amend commits or create new commits
@@ -300,21 +321,25 @@ Summary:
 ## Technical Requirements
 
 ### Platform Support
+
 - Linux
 - Python 3.12 or higher
 
 ### Dependencies
+
 - Git command-line client must be installed
 - Install click to manage appealing CLI
 - Test framework (tox, pytest, etc.) if testing enabled
 - Gerrit CLI tools if review submission enabled
 
 ### Performance Considerations
+
 - Should handle 50+ repositories efficiently
 - Consider parallel processing for independent operations
 - Provide progress indicators for long-running operations
 
 ### Security Considerations
+
 - Never store credentials in configuration files
 - Use SSH keys or credential managers for Git authentication
 - Validate and sanitize user-provided scripts before execution
@@ -370,35 +395,45 @@ A successful implementation should:
 ## Appendix: Example Use Cases
 
 ### Use Case 1: Security Dependency Update
+
 Update a vulnerable library across all microservices:
+
 - 30 microservice repositories
 - Patch script updates requirements.txt
 - Run tests to ensure compatibility
 - Submit all patches with topic "CVE-2025-1234-fix"
 
 ### Use Case 2: License Header Update
+
 Add or update license headers in all projects:
+
 - 50+ library repositories
 - Patch script adds SPDX headers to source files
 - Skip projects that already have headers
 - Commit without code review (internal compliance)
 
 ### Use Case 3: API Migration
+
 Migrate from deprecated API to new version:
+
 - 15 client libraries
 - Patch script runs find-replace for API methods
 - Run extensive test suite (blocking)
 - Submit for manual code review before merge
 
 ### Use Case 4: Multi-Branch Backport
+
 Apply security fix to multiple stable branches:
+
 - Apply same fix to main, stable/2.x, and stable/1.x
 - Use `--branch` option to target each branch
 - Ensure tests pass on all branches before committing
 - Automated workflow for consistent backporting
 
 ### Use Case 5: Automated Workflow with Custom Commands
+
 Complete automation from checkout to push:
+
 - Pre-commands: checkout branch, pull latest changes, run validation
 - Apply patch script for configuration updates
 - Post-commands: run tests, commit changes, push to remote

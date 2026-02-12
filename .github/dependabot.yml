@@ -50,7 +50,7 @@ updates:
         patterns:
           - "click"
         update-types:
-          - "patch"  # Only auto-group patch updates for production deps
+          - "patch" # Only auto-group patch updates for production deps
 
     # Automatically rebase PRs when conflicts occur
     rebase-strategy: "auto"
