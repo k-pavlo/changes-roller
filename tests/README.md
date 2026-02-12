@@ -56,18 +56,18 @@ pytest -m integration
 
 ## Test Coverage
 
-Current test coverage: **89%**
+To view current test coverage:
 
-### Coverage by Module
-- `roller/__init__.py`: 100%
-- `roller/cli.py`: 88%
-- `roller/config.py`: 100%
-- `roller/executor.py`: 72%
-- `roller/reporter.py`: 100%
-- `roller/repository.py`: 100%
-- `roller/workspace.py`: 100%
+```bash
+# Generate coverage report
+pytest --cov=roller --cov-report=term-missing
 
-The lower coverage in `executor.py` is primarily in the full execution workflow which requires actual file system operations and parallel processing that are better tested through integration tests.
+# Generate HTML report
+pytest --cov=roller --cov-report=html
+# Open htmlcov/index.html in your browser
+```
+
+The project maintains comprehensive test coverage across all modules. Some modules have lower coverage due to complex integration scenarios that require actual file system operations and parallel processing.
 
 ## Test Categories
 

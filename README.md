@@ -1,5 +1,10 @@
 # changes-roller
 
+[![PyPI version](https://badge.fury.io/py/changes-roller.svg)](https://badge.fury.io/py/changes-roller)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
 **Stop manually patching dozens of repositories. Automate it.**
 
 **Changes-Roller** is a command-line tool for creating and managing coordinated

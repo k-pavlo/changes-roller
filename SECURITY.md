@@ -14,7 +14,7 @@ If you discover a concern with this project, please report it responsibly.
 
 ### How to Report
 
-Please send details to: **pkostian@redhat.com**
+Please send details to: **pasha.k460@gmail.com**
 
 Include in your report:
 - Description of the concern
