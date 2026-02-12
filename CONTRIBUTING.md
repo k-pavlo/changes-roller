@@ -205,6 +205,187 @@ $ git commit -m "feat: add new feature"  # Commit again
 # All hooks pass!
 ```
 
+## Continuous Integration
+
+This project uses GitHub Actions for automated testing and quality checks on every pull request.
+
+### What CI Checks
+
+Every pull request automatically runs the following checks:
+
+#### 1. Code Quality (~2 min)
+
+Runs first to provide fast feedback:
+
+- **Ruff formatting** - Code formatting check
+- **Ruff linting** - Code quality and style check
+- **File validation** - Trailing whitespace, EOF, YAML/TOML syntax
+- **Prettier** - Markdown and JSON formatting
+
+These match the pre-commit hooks, so if pre-commit passes locally, this will pass in CI.
+
+#### 2. Type Checking (~2 min)
+
+Runs in parallel with code quality:
+
+- **MyPy** - Strict static type checking on Python 3.10
+- Ensures type safety across the codebase
+
+#### 3. Tests (~5-10 min)
+
+Runs after quality checks pass:
+
+- **128 tests** across 7 test files
+- **Multi-Python**: 3.10, 3.11, 3.12, 3.13
+- **Multi-OS**: Ubuntu, macOS, Windows
+- **Coverage reporting** - Uploaded to Codecov
+- **8 parallel test jobs** for comprehensive compatibility testing
+
+#### 4. Security Scanning (~2-3 min)
+
+- **Bandit** - Python code security issues
+- **pip-audit** - Dependency vulnerabilities (warning only)
+- **Dependency Review** - Blocks PRs introducing vulnerable dependencies
+
+### CI Workflow
+
+1. **Push commits** to your PR branch
+2. **CI automatically runs** all checks
+3. **Review results** in PR (status checks appear at bottom)
+4. **Fix failures** if any and push again
+5. **All checks must pass** before merging
+
+### Viewing CI Results
+
+**In your PR:**
+
+- Scroll to bottom of PR page
+- Status checks appear with ✓ (pass) or ✗ (fail)
+- Click "Details" next to any check to view logs
+
+**In Actions tab:**
+
+- Navigate to repository → Actions
+- Click on your workflow run
+- View detailed logs for each job
+
+### Troubleshooting CI Failures
+
+#### "lint-and-format" failed
+
+Most common causes:
+
+- Code formatting issues
+- Linting errors
+- Invalid YAML/TOML syntax
+
+**Fix locally:**
+
+```bash
+# Run pre-commit to see all issues
+pre-commit run --all-files
+
+# Auto-fix formatting
+ruff format .
+ruff check --fix .
+
+# Fix any remaining issues manually
+```
+
+#### "type-check" failed
+
+Type errors in the code.
+
+**Fix locally:**
+
+```bash
+# Run MyPy to see errors
+mypy roller/
+
+# Fix type errors
+# - Add type hints where missing
+# - Fix incorrect type annotations
+# - Use proper type guards
+```
+
+#### "test" failed
+
+Test failures or errors.
+
+**Fix locally:**
+
+```bash
+# Run tests to see failures
+pytest
+
+# Run specific failing test with verbose output
+pytest tests/test_cli.py::test_specific_function -v
+
+# Run with debugger
+pytest --pdb
+
+# Check coverage
+pytest --cov=roller --cov-report=term-missing
+```
+
+#### "bandit" (security) failed
+
+Security issues detected in code.
+
+**Fix locally:**
+
+```bash
+# Run Bandit to see issues
+bandit -c pyproject.toml -r roller/
+
+# Fix security issues
+# - Avoid shell=True in subprocess calls
+# - Validate user input
+# - Use secure random instead of random
+# - Don't hardcode secrets
+
+# If false positive, add comment:
+# nosec: B603 - subprocess call is safe here
+```
+
+### Local Pre-commit vs CI
+
+**Pre-commit hooks** (local):
+
+- Run **before commit** on changed files
+- Catch issues early before pushing
+- Fast feedback (~10-30 seconds)
+- Auto-fix many issues
+
+**CI checks** (GitHub Actions):
+
+- Run **on GitHub** on all files
+- Ensure comprehensive cross-platform testing
+- Slower but thorough (~10-15 minutes)
+- Required for merge
+
+**Best practice:**
+
+- Always let pre-commit hooks run (don't use `--no-verify`)
+- Pre-commit catches most issues before CI
+- CI provides comprehensive multi-platform validation
+
+### CI Performance
+
+**Expected times:**
+
+- Fast feedback (lint + type): ~2-4 minutes
+- Full test matrix: ~5-10 minutes
+- Security scans: ~2-3 minutes
+- **Total**: ~10-15 minutes for complete validation
+
+**Optimizations in place:**
+
+- Path ignore for docs-only changes
+- Caching for dependencies and tools
+- Parallel job execution
+- Reduced matrix for macOS/Windows
+
 ## Testing
 
 All code changes must include appropriate tests.
