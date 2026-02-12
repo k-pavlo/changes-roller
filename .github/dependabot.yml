@@ -1,0 +1,87 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "k-pavlo"
+    labels:
+      - "dependencies"
+      - "python"
+    # Group dependency updates by type
+    groups:
+      # Development dependencies
+      dev-dependencies:
+        patterns:
+          - "ruff"
+          - "mypy"
+          - "bandit"
+          - "pre-commit"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Testing dependencies
+      test-dependencies:
+        patterns:
+          - "pytest*"
+          - "coverage"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Documentation dependencies
+      docs-dependencies:
+        patterns:
+          - "sphinx*"
+          - "furo"
+          - "myst-parser"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Production dependencies (Click is the only runtime dependency)
+      production-dependencies:
+        patterns:
+          - "click"
+        update-types:
+          - "patch"  # Only auto-group patch updates for production deps
+
+    # Automatically rebase PRs when conflicts occur
+    rebase-strategy: "auto"
+
+    # Commit message configuration
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "k-pavlo"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    # Group GitHub Actions updates
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

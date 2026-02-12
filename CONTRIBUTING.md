@@ -231,6 +231,16 @@ Categories: **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Se
 
 ## Issue Reporting
 
+### Creating Issues
+
+When creating an issue, please use the appropriate issue template:
+
+- **[Bug Report](.github/ISSUE_TEMPLATE/bug_report.yml)** - Report bugs or unexpected behavior
+- **[Feature Request](.github/ISSUE_TEMPLATE/feature_request.yml)** - Suggest new features or enhancements
+- **[Documentation](.github/ISSUE_TEMPLATE/documentation.yml)** - Suggest documentation improvements
+
+The templates will guide you through providing all necessary information.
+
 ### Before Creating an Issue
 
 - Search existing issues to avoid duplicates
@@ -239,7 +249,7 @@ Categories: **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Se
 
 ### Bug Reports
 
-Include:
+When reporting bugs, the template will ask for:
 - Clear description of the problem
 - Steps to reproduce
 - Expected vs actual behavior
@@ -249,18 +259,20 @@ Include:
 
 ### Feature Requests
 
-Include:
+When requesting features, the template will ask for:
 - Clear description of the desired functionality
 - Use cases and motivation
-- Proposed implementation approach (optional)
-- Willingness to contribute (if applicable)
+- Proposed implementation approach
+- Impact on your workflow
+- Willingness to contribute
 
 ### Questions and Discussions
 
 For questions about usage:
 - Check the README and documentation first
 - Search closed issues for similar questions
-- Open a GitHub Discussion or issue with the question label
+- Open a [GitHub Discussion](https://github.com/k-pavlo/changes-roller/discussions)
+- For security issues, see [SECURITY.md](SECURITY.md)
 
 ## Development Workflow Summary
 

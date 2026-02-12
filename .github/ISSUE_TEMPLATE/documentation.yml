@@ -1,0 +1,101 @@
+name: Documentation Improvement
+description: Suggest improvements to documentation
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Clear documentation helps everyone.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs improvement?
+      options:
+        - README.md
+        - USAGE.md (User Guide)
+        - SPECIFICATION.md
+        - CONTRIBUTING.md
+        - Code comments or docstrings
+        - API documentation
+        - Examples
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Where in the documentation is the issue?
+      placeholder: "e.g., README.md line 42, USAGE.md 'Branch Switching' section"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue with Current Documentation
+      description: What is unclear, missing, incorrect, or could be improved?
+      placeholder: Describe what's wrong with the current documentation...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        Describe or provide the improved documentation...
+
+        If providing specific text, please format it appropriately:
+        ```markdown
+        Your suggested documentation text here...
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Why is this improvement important? Who would benefit?
+      placeholder: |
+        Example: "New users get confused by this section..."
+        Example: "This feature isn't documented at all..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: doc-areas
+    attributes:
+      label: Related Areas
+      description: Which areas of documentation might also need updates?
+      options:
+        - label: README.md
+        - label: USAGE.md
+        - label: SPECIFICATION.md
+        - label: CONTRIBUTING.md
+        - label: Code comments
+        - label: Examples
+        - label: CLI help text
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to submit a PR with this documentation improvement
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked that this documentation issue doesn't already have an open issue
+          required: true
+        - label: I have verified the current state of the documentation
+          required: true
