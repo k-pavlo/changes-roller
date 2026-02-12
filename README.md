@@ -1,9 +1,12 @@
 # changes-roller
 
 [![PyPI version](https://badge.fury.io/py/changes-roller.svg)](https://badge.fury.io/py/changes-roller)
-[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![CI](https://github.com/k-pavlo/changes-roller/workflows/CI/badge.svg)](https://github.com/k-pavlo/changes-roller/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/k-pavlo/changes-roller/branch/main/graph/badge.svg)](https://codecov.io/gh/k-pavlo/changes-roller)
+[![Security](https://github.com/k-pavlo/changes-roller/workflows/Security/badge.svg)](https://github.com/k-pavlo/changes-roller/actions/workflows/security.yml)
 
 **Stop manually patching dozens of repositories. Automate it.**
 
@@ -24,6 +27,18 @@ changes-roller transforms this soul-crushing routine into a five-minute automati
 - License header updates for compliance
 - Configuration file standardization
 - Any scenario requiring identical changes across multiple repositories
+
+## Project Status
+
+This project maintains high quality standards through automated testing and continuous integration:
+
+- **128 tests** with >90% code coverage
+- **Multi-platform testing** across Python 3.10-3.13 on Linux, macOS, and Windows
+- **Automated quality checks** including strict type checking (MyPy), linting (Ruff), and security scanning (Bandit)
+- **Pre-commit hooks** enforce code quality before commits
+- **Continuous security monitoring** with pip-audit and dependency review
+
+All pull requests undergo comprehensive automated testing to ensure reliability and maintainability.
 
 ## How It Works
 
@@ -56,7 +71,7 @@ pip install .
 
 ## Requirements
 
-- Python 3.12 or higher
+- Python 3.10 or higher
 - Git command-line client
 - git-review (optional, for Gerrit integration)
 
