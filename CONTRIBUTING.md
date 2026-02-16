@@ -528,6 +528,70 @@ When submitting a PR, add an entry to the `[Unreleased]` section in `CHANGELOG.m
 
 Categories: **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Security**
 
+### Automated Version Bumping
+
+This project uses [Commitizen](https://commitizen-tools.github.io/commitizen/) for automated semantic versioning.
+
+#### How Version Bumping Works
+
+Version numbers are automatically calculated from your commit messages:
+
+- `feat:` commits → MINOR version bump (0.1.0 → 0.2.0)
+- `fix:` commits → PATCH version bump (0.1.0 → 0.1.1)
+- `BREAKING CHANGE:` in commit footer → MAJOR version bump (0.1.0 → 1.0.0)
+- Other commit types (docs, style, etc.) → No version bump
+
+#### Bumping a New Version
+
+**Maintainers only** - Contributors don't need to bump versions.
+
+```bash
+# 1. Ensure all changes are committed
+git status
+
+# 2. Preview the version bump (dry run)
+cz bump --dry-run
+
+# 3. Bump the version
+cz bump
+
+# This automatically:
+# - Determines version increment from commits
+# - Updates version in pyproject.toml and roller/__init__.py
+# - Updates CHANGELOG.md with release notes
+# - Creates a git commit and tag
+# - Does NOT push (you control when to push)
+
+# 4. Review the changes
+git log -1 --stat
+git show HEAD
+
+# 5. Push the release
+git push
+git push --tags
+```
+
+#### Manual Override
+
+Force a specific version increment if needed:
+
+```bash
+cz bump --increment MAJOR   # Force major version bump
+cz bump --increment MINOR   # Force minor version bump
+cz bump --increment PATCH   # Force patch version bump
+```
+
+#### Troubleshooting
+
+**"No commits found to bump version"**
+
+- No commits with feat/fix/BREAKING CHANGE since last version
+- Solution: This is expected; version only bumps when there's new functionality or fixes
+
+**"Version file not found"**
+
+- Ensure version format matches: `version = "X.Y.Z"` and `__version__ = "X.Y.Z"`
+
 ## Issue Reporting
 
 ### Creating Issues
