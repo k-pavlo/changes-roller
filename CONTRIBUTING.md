@@ -428,6 +428,47 @@ pytest -k "test_apply"
 - Tests must pass before submitting a PR
 - Maintain or improve code coverage
 
+## Documentation
+
+We use Sphinx to generate documentation hosted on ReadTheDocs.
+
+### Building Documentation Locally
+
+```bash
+# Install documentation dependencies
+pip install -e ".[docs]"
+
+# Build HTML documentation
+cd docs
+sphinx-build -b html . _build/html
+
+# View documentation
+# Open docs/_build/html/index.html in your browser
+```
+
+### Documentation Structure
+
+- `docs/` - Sphinx documentation source files
+- `docs/conf.py` - Sphinx configuration
+- `docs/index.rst` - Main documentation index
+- `docs/*.md` - Documentation pages (Markdown format)
+- `.readthedocs.yaml` - ReadTheDocs configuration
+
+### Writing Documentation
+
+- Use Markdown (`.md`) for most documentation pages
+- Follow the existing structure and style
+- Include code examples where appropriate
+- Update relevant docs when adding features or changing behavior
+- Test documentation builds locally before submitting
+
+### ReadTheDocs Integration
+
+- Documentation builds automatically on every commit to main
+- View live documentation at: https://changes-roller.readthedocs.io
+- Documentation for pull requests is built as preview versions
+- Build status is visible in PR checks
+
 ## Submitting Changes
 
 ### Before Submitting
