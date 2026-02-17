@@ -592,6 +592,295 @@ cz bump --increment PATCH   # Force patch version bump
 
 - Ensure version format matches: `version = "X.Y.Z"` and `__version__ = "X.Y.Z"`
 
+## Release Process
+
+This project uses automated PyPI publishing via GitHub Actions with **Trusted Publishers** (OIDC) - a secure, token-free authentication method.
+
+### How Releases Work
+
+When a version tag is pushed to GitHub, an automated workflow:
+
+1. **Builds** the package using hatchling
+2. **Publishes** to PyPI using secure OIDC authentication (no API tokens needed)
+3. **Creates** a GitHub Release with auto-generated release notes
+4. **Attaches** distribution files to the release
+
+### Creating a Release
+
+**Maintainers only** - This process is for project maintainers.
+
+#### Step 1: Ensure Main Branch is Ready
+
+```bash
+# Switch to main branch
+git checkout main
+
+# Pull latest changes
+git pull origin main
+
+# Verify everything is clean
+git status
+
+# Run all quality checks
+pre-commit run --all-files
+pytest
+```
+
+#### Step 2: Bump Version with Commitizen
+
+```bash
+# Preview the version bump
+cz bump --dry-run
+
+# Bump the version (creates commit and tag)
+cz bump
+
+# Review the changes
+git log -1 --stat
+git show HEAD
+```
+
+This automatically:
+
+- Calculates version from conventional commits
+- Updates `pyproject.toml` and `roller/__init__.py`
+- Updates `CHANGELOG.md` with release notes
+- Creates a git commit with the changes
+- Creates a version tag (e.g., `v0.2.0`)
+
+#### Step 3: Push to Trigger Release
+
+```bash
+# Push the version bump commit
+git push origin main
+
+# Push the version tag (this triggers the release workflow)
+git push origin --tags
+```
+
+#### Step 4: Monitor Release Workflow
+
+1. Navigate to **Actions** tab on GitHub
+2. Watch the **Release to PyPI** workflow
+3. Verify all jobs succeed:
+   - ✅ Build distribution packages
+   - ✅ Publish to PyPI
+   - ✅ Create GitHub Release
+
+#### Step 5: Verify Release
+
+**Check PyPI:**
+
+- Visit: https://pypi.org/project/changes-roller/
+- Verify new version is published
+- Test installation: `pip install changes-roller==<version>`
+
+**Check GitHub Release:**
+
+- Visit: https://github.com/k-pavlo/changes-roller/releases
+- Verify release is created with proper notes
+- Check that distribution files are attached
+
+### Trusted Publishers (OIDC)
+
+This project uses **Trusted Publishers** for secure PyPI authentication:
+
+#### What is Trusted Publishing?
+
+- **Token-free authentication** using OpenID Connect (OIDC)
+- GitHub Actions authenticates directly with PyPI
+- No long-lived API tokens to manage or secure
+- Scoped to specific repository and workflow
+- PyPI's recommended approach for automated publishing
+
+#### Security Benefits
+
+✅ **No secrets stored** in GitHub repository
+✅ **Automatic token rotation** via OIDC
+✅ **Scoped permissions** to specific repo/workflow
+✅ **Audit trail** of all publishing events
+✅ **Cannot be leaked** - tokens are ephemeral
+
+#### Configuration
+
+**On PyPI** (already configured):
+
+1. Go to project settings: https://pypi.org/manage/project/changes-roller/settings/
+2. Navigate to "Publishing" tab
+3. Trusted publisher configured with:
+   - Owner: `k-pavlo`
+   - Repository: `changes-roller`
+   - Workflow: `release.yml`
+   - Environment: `release`
+
+**In GitHub** (workflow permissions):
+
+```yaml
+permissions:
+  id-token: write # Required for OIDC authentication
+```
+
+### Release Workflow Details
+
+The `.github/workflows/release.yml` workflow includes three jobs:
+
+#### 1. Build (runs on all platforms)
+
+- Checks out code
+- Sets up Python 3.12
+- Builds wheel and source distribution with hatchling
+- Uploads artifacts for publishing
+
+#### 2. Publish to PyPI (runs after build)
+
+- Downloads built distributions
+- Authenticates via OIDC (no token needed)
+- Publishes to PyPI using `pypa/gh-action-pypi-publish`
+- Uses `release` environment for protection
+
+#### 3. Create GitHub Release (runs after publish)
+
+- Creates GitHub Release from tag
+- Auto-generates release notes from commits
+- Attaches distribution files
+- Links to PyPI package page
+
+### Hotfix Releases
+
+For urgent bug fixes:
+
+```bash
+# 1. Create hotfix branch from main
+git checkout -b hotfix/critical-fix main
+
+# 2. Make minimal fixes
+# ... edit code ...
+
+# 3. Commit with conventional commit message
+git commit -m "fix: resolve critical security vulnerability"
+
+# 4. Merge to main
+git checkout main
+git merge hotfix/critical-fix
+
+# 5. Bump version (will be PATCH increment)
+cz bump
+
+# 6. Push to release
+git push origin main
+git push origin --tags
+```
+
+### Rollback Strategy
+
+If a release has issues:
+
+#### Option 1: Yank Release (PyPI)
+
+```bash
+# Yank the problematic version on PyPI
+# This prevents new installations but doesn't break existing ones
+# Must be done manually via PyPI web interface
+```
+
+1. Go to https://pypi.org/manage/project/changes-roller/releases/
+2. Find the problematic version
+3. Click "Options" → "Yank release"
+4. Provide reason for yanking
+
+#### Option 2: Release Fix Immediately
+
+```bash
+# 1. Fix the issue on main
+git commit -m "fix: resolve regression in v0.2.0"
+
+# 2. Bump version (PATCH increment)
+cz bump
+
+# 3. Push to release
+git push origin main
+git push origin --tags
+```
+
+### Troubleshooting Releases
+
+#### "Trusted publisher validation failed"
+
+**Cause:** OIDC configuration mismatch between PyPI and GitHub workflow.
+
+**Solution:**
+
+1. Verify PyPI trusted publisher settings match workflow
+2. Ensure workflow uses `release` environment
+3. Check that workflow has `id-token: write` permission
+
+#### "Package already exists on PyPI"
+
+**Cause:** Trying to re-upload same version.
+
+**Solution:**
+
+1. PyPI doesn't allow re-uploading same version
+2. Bump to new version and release again
+3. If needed, yank the old version on PyPI
+
+#### "Build failed"
+
+**Cause:** Package build error with hatchling.
+
+**Solution:**
+
+```bash
+# Test build locally
+pip install --upgrade build hatchling
+python -m build
+
+# Fix any build errors
+# Commit fixes and push
+```
+
+#### "GitHub Release creation failed"
+
+**Cause:** Workflow lacks permissions or tag already has release.
+
+**Solution:**
+
+1. Check workflow has `contents: write` permission
+2. Delete existing release if re-creating
+3. Re-run workflow from Actions tab
+
+### Pre-release Versions
+
+For testing before official release:
+
+```bash
+# Manually create pre-release version
+# Edit version in pyproject.toml and roller/__init__.py to:
+# version = "0.2.0rc1"  # Release candidate
+
+# Commit and tag
+git commit -m "chore: prepare release candidate 0.2.0rc1"
+git tag v0.2.0rc1
+git push origin main --tags
+
+# This publishes to PyPI as pre-release
+# Users can install with: pip install --pre changes-roller
+```
+
+### Release Checklist
+
+Before creating a release:
+
+- [ ] All tests passing in CI
+- [ ] CHANGELOG.md updated (done automatically by `cz bump`)
+- [ ] Version bumped with `cz bump`
+- [ ] Tag created and pushed
+- [ ] GitHub Actions workflow succeeded
+- [ ] PyPI package published and installable
+- [ ] GitHub Release created
+- [ ] Documentation updated (if needed)
+- [ ] Announcement drafted (if major release)
+
 ## Issue Reporting
 
 ### Creating Issues
