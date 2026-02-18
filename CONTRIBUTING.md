@@ -908,6 +908,144 @@ git push origin main --tags
 # Users can install with: pip install --pre changes-roller
 ```
 
+### Automated Release Notes (Release Drafter)
+
+This project uses **GitHub Release Drafter** to automatically generate and maintain draft release notes.
+
+#### How It Works
+
+Release Drafter automatically:
+
+- **Monitors merged PRs** - Runs on every push to main
+- **Updates draft release** - Continuously maintains next release draft
+- **Categorizes changes** - Groups PRs by type (Features, Bug Fixes, etc.)
+- **Auto-labels PRs** - Labels PRs based on conventional commit prefixes in titles
+- **Suggests version** - Calculates next version based on PR labels
+
+#### Release Note Categories
+
+PRs are automatically categorized based on labels or conventional commit prefixes:
+
+| Category         | Labels                        | Commit Prefix      | Examples                 |
+| ---------------- | ----------------------------- | ------------------ | ------------------------ |
+| 🚀 Features      | `feature`, `enhancement`      | `feat:`, `feat():` | New functionality        |
+| 🐛 Bug Fixes     | `bug`, `fix`                  | `fix:`, `fix():`   | Bug fixes                |
+| 📚 Documentation | `documentation`, `docs`       | `docs:`, `docs():` | Docs updates             |
+| 🔧 Maintenance   | `chore`, `dependencies`, `ci` | `chore:`, `ci:`    | Maintenance tasks        |
+| ⚡ Performance   | `performance`, `perf`         | `perf:`            | Performance improvements |
+| 🔒 Security      | `security`                    | (auto-detected)    | Security fixes           |
+
+#### Auto-labeling
+
+PRs are automatically labeled based on their title:
+
+```
+feat: Add branch switching support → labeled "feature"
+fix: Resolve path issue → labeled "bug"
+docs: Update README → labeled "documentation"
+chore: Update dependencies → labeled "chore"
+```
+
+#### Viewing Draft Releases
+
+**To see the current draft release:**
+
+1. Navigate to https://github.com/k-pavlo/changes-roller/releases
+2. Look for the release marked as **"Draft"**
+3. This shows what the next release notes will look like
+
+**Draft releases are:**
+
+- Created automatically after first PR merge
+- Updated automatically on every merge to main
+- Not visible to the public (only maintainers can see drafts)
+- Ready to publish when you're ready to release
+
+#### Publishing a Release
+
+When you're ready to release (after running `cz bump` and pushing tags):
+
+**Option 1: Automatic (Recommended)**
+
+The release workflow automatically creates and publishes the GitHub Release when you push a version tag. No manual action needed.
+
+```bash
+# After running cz bump
+git push origin main
+git push origin --tags  # This triggers automatic release creation
+```
+
+**Option 2: Manual Enhancement**
+
+If you want to customize the release notes before publishing:
+
+1. Push the version tag (triggers PyPI publish)
+2. Go to https://github.com/k-pavlo/changes-roller/releases
+3. Find the draft release for your version
+4. Edit the release notes if needed
+5. Since the tag exists, the release will be created automatically by the workflow
+
+The automatic release includes:
+
+- Release notes from commits (via `generate_release_notes: true`)
+- Installation instructions
+- Link to CHANGELOG.md
+- Link to PyPI package
+- Distribution files attached
+
+#### Example Release Notes
+
+Here's what Release Drafter generates:
+
+```markdown
+## What's Changed
+
+### 🚀 Features
+
+- Add git branch switching support @contributor (#12)
+- Add custom command execution @contributor (#13)
+
+### 🐛 Bug Fixes
+
+- Fix path resolution edge case @contributor (#15)
+
+### 📚 Documentation
+
+- Update installation instructions @contributor (#16)
+
+### 🔧 Maintenance
+
+- Update dependencies @dependabot (#17)
+
+**Full Changelog**: https://github.com/k-pavlo/changes-roller/compare/v0.1.0...v0.2.0
+```
+
+#### Best Practices
+
+**For contributors:**
+
+- Use conventional commit prefixes in PR titles (e.g., `feat:`, `fix:`)
+- PRs will be automatically labeled and categorized
+- Clear, descriptive PR titles appear directly in release notes
+
+**For maintainers:**
+
+- Review draft release notes periodically
+- Draft updates automatically - no manual action needed
+- Edit draft if PR titles need clarification before release
+- Manual labels can override auto-labeling if needed
+
+#### Configuration
+
+Release Drafter configuration is in `.github/release-drafter.yml`:
+
+- **Categories** - How changes are grouped
+- **Auto-labeling rules** - Pattern matching for automatic labels
+- **Version resolution** - How version is calculated from labels
+- **Template** - Format of release notes
+
+Workflow configuration is in `.github/workflows/release-drafter.yml`.
+
 ### Release Checklist
 
 Before creating a release:
@@ -918,7 +1056,8 @@ Before creating a release:
 - [ ] Tag created and pushed
 - [ ] GitHub Actions workflow succeeded
 - [ ] PyPI package published and installable
-- [ ] GitHub Release created
+- [ ] GitHub Release created (automatic)
+- [ ] Review draft release notes (optional)
 - [ ] Documentation updated (if needed)
 - [ ] Announcement drafted (if major release)
 

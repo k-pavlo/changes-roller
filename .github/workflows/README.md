@@ -72,6 +72,70 @@ This directory contains CI/CD workflows for the changes-roller project.
 
 ---
 
+### release.yml - PyPI Publishing
+
+**Triggers:** Version tag push (`v*`), Manual dispatch
+
+**Purpose:** Automated package publishing to PyPI and GitHub Releases
+
+**Jobs:**
+
+1. **build** (~2 min)
+   - Builds wheel and source distribution with hatchling
+   - Uploads distribution artifacts
+
+2. **publish-to-pypi** (~1-2 min)
+   - Downloads built distributions
+   - Publishes to PyPI using trusted publisher (OIDC)
+   - Uses `release` environment for protection
+   - No API token needed (secure OIDC authentication)
+
+3. **github-release** (~1 min)
+   - Creates GitHub Release from tag
+   - Auto-generates release notes from commits
+   - Attaches distribution files
+   - Links to PyPI package page
+
+**Required for merge:** No (runs only on tag push)
+
+**Security:** Uses OpenID Connect (OIDC) trusted publisher for secure, token-free PyPI authentication
+
+---
+
+### release-drafter.yml - Automated Release Notes
+
+**Triggers:** Push to main, Pull requests
+
+**Purpose:** Automatically generate and maintain draft release notes
+
+**Jobs:**
+
+1. **update_release_draft** (~30 sec)
+   - Monitors merged PRs to main branch
+   - Updates draft release with categorized changes
+   - Auto-labels PRs based on conventional commit prefixes
+   - Suggests next version based on PR labels
+
+**Required for merge:** No (informational only)
+
+**How it works:**
+
+- Every PR merged to main updates the draft release
+- PRs are categorized by type (Features, Bug Fixes, Docs, etc.)
+- Uses conventional commit prefixes for auto-labeling:
+  - `feat:` → Features 🚀
+  - `fix:` → Bug Fixes 🐛
+  - `docs:` → Documentation 📚
+  - `chore:`, `ci:` → Maintenance 🔧
+  - `perf:` → Performance ⚡
+  - Security-related → Security 🔒
+
+**View draft releases:** https://github.com/k-pavlo/changes-roller/releases (maintainers only)
+
+**Configuration:** `.github/release-drafter.yml` defines categories, auto-labeling rules, and release note template
+
+---
+
 ## Local Development
 
 Run CI checks locally before pushing:
