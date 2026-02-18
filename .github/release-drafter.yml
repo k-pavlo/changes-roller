@@ -1,0 +1,104 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "feature"
+      - "enhancement"
+    collapse-after: 5
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "bug"
+      - "fix"
+  - title: "📚 Documentation"
+    labels:
+      - "documentation"
+      - "docs"
+  - title: "🔧 Maintenance"
+    labels:
+      - "chore"
+      - "dependencies"
+      - "ci"
+  - title: "⚡ Performance"
+    labels:
+      - "performance"
+      - "perf"
+  - title: "🔒 Security"
+    labels:
+      - "security"
+
+# Automatically categorize PRs based on conventional commit prefixes in title
+autolabeler:
+  - label: "feature"
+    title:
+      - '/^feat(\(.+\))?:/i'
+  - label: "bug"
+    title:
+      - '/^fix(\(.+\))?:/i'
+  - label: "documentation"
+    title:
+      - '/^docs(\(.+\))?:/i'
+  - label: "chore"
+    title:
+      - '/^chore(\(.+\))?:/i'
+  - label: "ci"
+    title:
+      - '/^ci(\(.+\))?:/i'
+  - label: "performance"
+    title:
+      - '/^perf(\(.+\))?:/i'
+  - label: "security"
+    title:
+      - "/security/i"
+      - '/^fix(\(.+\))?: .*\b(security|vulnerability|cve)\b/i'
+
+version-resolver:
+  major:
+    labels:
+      - "breaking"
+      - "major"
+  minor:
+    labels:
+      - "feature"
+      - "enhancement"
+  patch:
+    labels:
+      - "bug"
+      - "fix"
+      - "chore"
+      - "dependencies"
+      - "security"
+  default: patch
+
+# Exclude certain labels from appearing in release notes
+exclude-labels:
+  - "skip-changelog"
+  - "duplicate"
+  - "invalid"
+  - "wontfix"
+
+# Exclude certain contributors (e.g., bots)
+exclude-contributors:
+  - "dependabot"
+  - "dependabot[bot]"
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&' # Escape special markdown characters
+
+no-changes-template: |
+  ## What's Changed
+
+  - Internal changes and improvements
+
+replacers:
+  # Remove conventional commit prefixes for cleaner release notes
+  - search: '/^(feat|fix|docs|chore|ci|perf|refactor|test|style)(\(.+\))?:\s*/i'
+    replace: ""
