@@ -67,15 +67,30 @@ git log -1 --stat
 git show HEAD
 ```
 
-### Step 3: Push to Trigger Release
+### Step 3: Create Merge Request and Push Tag
+
+Since the main branch is protected and requires merge requests:
 
 ```bash
-# Push the version bump commit
-git push origin main
+# Create a release branch
+git checkout -b release/v$(git describe --tags --abbrev=0 | sed 's/v//')
 
-# Push the version tag (triggers automated release)
+# Push both the branch and tag
+git push origin release/v$(git describe --tags --abbrev=0 | sed 's/v//')
 git push origin --tags
+
+# Create merge request from your release branch to main
+# (Use your Git hosting platform's UI or CLI)
+
+# After the MR is approved and merged, the release workflow
+# will trigger automatically because the tag is already pushed
 ```
+
+**How it works:**
+
+- The release workflow triggers when a tag matching `v*` is pushed to GitHub
+- It doesn't matter if commits reach main via direct push or merge request
+- Once your MR is merged and the tag points to a commit on main, the pipeline runs automatically
 
 ### Step 4: Monitor Release Workflow
 
@@ -124,16 +139,15 @@ git checkout -b hotfix/critical-fix main
 # 3. Commit with conventional commit message
 git commit -m "fix: resolve critical security vulnerability"
 
-# 4. Merge to main
-git checkout main
-git merge hotfix/critical-fix
-
-# 5. Bump version (will be PATCH increment)
+# 4. Bump version (will be PATCH increment)
 cz bump
 
-# 6. Push to release
-git push origin main
+# 5. Push branch and tag
+git push origin hotfix/critical-fix
 git push origin --tags
+
+# 6. Create merge request to main
+# After MR is approved and merged, the release workflow triggers automatically
 ```
 
 ## Pre-release Versions
@@ -169,15 +183,21 @@ Prevents new installations but doesn't break existing ones:
 ### Option 2: Release Fix Immediately
 
 ```bash
-# 1. Fix the issue on main
+# 1. Create fix branch
+git checkout -b fix/regression main
+
+# 2. Fix the issue
 git commit -m "fix: resolve regression in v0.2.0"
 
-# 2. Bump version (PATCH increment)
+# 3. Bump version (PATCH increment)
 cz bump
 
-# 3. Push to release
-git push origin main
+# 4. Push branch and tag
+git push origin fix/regression
 git push origin --tags
+
+# 5. Create merge request and merge to main
+# Release workflow triggers automatically after merge
 ```
 
 ## Changelog Management
@@ -320,9 +340,12 @@ Draft releases are:
 The release workflow automatically creates and publishes the GitHub Release when you push a version tag.
 
 ```bash
-# After running cz bump
-git push origin main
+# After running cz bump, push branch and tag
+git push origin your-release-branch
 git push origin --tags  # This triggers automatic release creation
+
+# Create and merge MR to main
+# Release will be published once the MR is merged
 ```
 
 The automatic release includes:
