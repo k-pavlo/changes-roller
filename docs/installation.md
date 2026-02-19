@@ -1,10 +1,9 @@
 # Installation
 
-## Requirements
-
-- Python 3.10 or higher
-- Git command-line client
-- git-review (optional, for Gerrit integration)
+```{include} ../README.md
+:start-after: "## Requirements"
+:end-before: "## Quick Start"
+```
 
 ## Installing from PyPI
 
@@ -145,5 +144,5 @@ python3 --version
 If you have multiple Python versions, specify the correct one:
 
 ```bash
-python3.10 -m pip install changes-roller
+python3 -m pip install changes-roller
 ```
