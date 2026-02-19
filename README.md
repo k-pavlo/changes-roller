@@ -14,11 +14,13 @@
 **Changes-Roller** is a command-line tool for creating and managing coordinated
 patch series across multiple Git repositories simultaneously.
 
+![Demo](demos/basic-workflow.gif)
+
 ## Why changes-roller?
 
-It's Tuesday morning, and you've just discovered a critical security vulnerability affecting 47 of your repositories. You know what comes next: hours of manual cloning, editing, committing, and reviewing. Your afternoon vanishes into mechanical `git clone`, `git commit`, `git review` while your actual development work waits.
+When you need to apply the same change across multiple repositories—whether it's a security patch, dependency update, or configuration change—doing it manually is time-consuming and error-prone. You have to clone each repository, apply the change, commit, and submit for review, repeating this process dozens of times.
 
-changes-roller transforms this soul-crushing routine into a five-minute automation. Write your patch script once, then watch as it executes across all repositories in parallel. What used to consume your entire afternoon now runs while you grab coffee—with consistent changes, uniform commit messages, and organized code reviews.
+changes-roller automates this workflow. Write your patch script once, and it executes across all repositories in parallel. Changes are applied consistently with uniform commit messages, and optionally submitted for code review—all from a single command.
 
 **Perfect for:**
 
@@ -33,7 +35,7 @@ changes-roller transforms this soul-crushing routine into a five-minute automati
 
 This project maintains high quality standards through automated testing and continuous integration:
 
-- **128 tests** with >90% code coverage
+- **Comprehensive test suite** with high code coverage
 - **Multi-platform testing** across Python 3.10-3.13 on Linux, macOS, and Windows
 - **Automated quality checks** including strict type checking (MyPy), linting (Ruff), and security scanning (Bandit)
 - **Pre-commit hooks** enforce code quality before commits
@@ -241,13 +243,25 @@ blocking = true
 command = tox -e pep8
 ```
 
-### More Examples
+## Examples
 
-See the `examples/` directory for complete examples:
+See the `examples/` directory for complete working examples:
 
-- `examples/dependency-update/` - Update a dependency across repos
-- `examples/license-headers/` - Add license headers to source files
-- `examples/config-migration/` - Migrate configuration files
+### [Dependency Update](examples/dependency-update/) - Template
+
+Generic example showing how to update dependencies across multiple repos. Uses placeholder repository URLs - copy and customize for your own projects.
+
+### [Oslo Dependency Update](examples/oslo-dependency-update/) - Real Example
+
+Update pbr dependency across oslo.\* libraries. Uses real OpenStack repositories and demonstrates Gerrit integration.
+
+Each example includes:
+
+- Complete patch script with error handling
+- Configured series.ini file
+- README with usage instructions and customization guide
+
+For more examples and use cases, see the [documentation examples page](https://changes-roller.readthedocs.io/en/latest/examples.html).
 
 ## Development
 

@@ -54,21 +54,10 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Features
-========
-
-* Apply patches to multiple Git repositories in parallel
-* Custom patch scripts with full repository access
-* Automated Git operations (clone, commit, stage)
-* **Git branch switching** - Apply changes to specific branches (e.g., stable branches)
-* **Custom command execution** - Run commands before/after applying changes
-* **Dry-run mode** - Preview operations without executing them
-* Automatic commit sign-off (Signed-off-by line)
-* Automatic git-review setup for Gerrit integration
-* Commit message templating with variables
-* Gerrit code review integration with topic grouping
-* Optional test execution before committing
-* Clear progress reporting and error handling
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
+   :start-after: ## Features
+   :end-before: ## Installation
 
 Quick Links
 ===========
@@ -78,25 +67,15 @@ Quick Links
 * `PyPI Package <https://pypi.org/project/changes-roller/>`_
 * `Changelog <https://github.com/k-pavlo/changes-roller/blob/main/CHANGELOG.md>`_
 
-Project Status
-==============
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
+   :start-after: ## Project Status
+   :end-before: ## How It Works
 
-This project maintains high quality standards through automated testing and continuous integration:
-
-* **128 tests** with >90% code coverage
-* **Multi-platform testing** across Python 3.10-3.13 on Linux, macOS, and Windows
-* **Automated quality checks** including strict type checking (MyPy), linting (Ruff), and security scanning (Bandit)
-* **Pre-commit hooks** enforce code quality before commits
-* **Continuous security monitoring** with pip-audit and dependency review
-
-All pull requests undergo comprehensive automated testing to ensure reliability and maintainability.
-
-Requirements
-============
-
-* Python 3.10 or higher
-* Git command-line client
-* git-review (optional, for Gerrit integration)
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
+   :start-after: ## Requirements
+   :end-before: ## Quick Start
 
 License
 =======

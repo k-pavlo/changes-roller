@@ -1,0 +1,8 @@
+# Generated demo files
+*.mp4
+*.webm
+
+# Temporary files
+*.txt
+demo.ini
+series.ini

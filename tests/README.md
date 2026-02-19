@@ -8,13 +8,13 @@ This directory contains comprehensive tests for the changes-roller project.
 tests/
 ├── __init__.py              # Test package initialization
 ├── conftest.py             # Shared pytest fixtures
-├── test_cli.py             # CLI interface tests (19 tests)
-├── test_config.py          # Configuration parsing tests (13 tests)
-├── test_executor.py        # Patch executor tests (17 tests)
-├── test_integration.py     # Integration tests (9 tests)
-├── test_reporter.py        # Output reporter tests (17 tests)
-├── test_repository.py      # Git repository operations tests (22 tests)
-└── test_workspace.py       # Workspace management tests (9 tests)
+├── test_cli.py             # CLI interface tests
+├── test_config.py          # Configuration parsing tests
+├── test_executor.py        # Patch executor tests
+├── test_integration.py     # Integration tests
+├── test_reporter.py        # Output reporter tests
+├── test_repository.py      # Git repository operations tests
+└── test_workspace.py       # Workspace management tests
 ```
 
 ## Running Tests

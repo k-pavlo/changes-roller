@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Commit message templating with variables (e.g., `{{ project_name }}`)
 - Gerrit code review integration with topic grouping
 - Optional test execution before committing
-- Comprehensive test suite with >90% code coverage
+- Comprehensive test suite with high code coverage
 - Code quality tools (Ruff for linting/formatting, MyPy for type checking, Bandit for security)
 - Rich PyPI metadata with project URLs and classifiers
 - MIT License
