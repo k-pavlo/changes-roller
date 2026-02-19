@@ -1,6 +1,6 @@
 [project]
 name = "changes-roller"
-version = "0.1.0"
+version = "0.2.0"
 description = "A command-line tool for creating and managing coordinated patch series across multiple Git repositories"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -170,7 +170,7 @@ skips = ["B101", "B404", "B603", "B607", "B602"]
 # Commitizen configuration
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.0"
+version = "0.2.0"
 version_provider = "pep621"
 version_scheme = "pep440"
 tag_format = "v$version"

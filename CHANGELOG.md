@@ -5,13 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Added
-- Community standard files (CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md)
-- This CHANGELOG.md following Keep a Changelog format
-
-## [0.1.0] - 2026-02-11
 
 ### Added
 - CLI tool for coordinated patch series across multiple repositories
@@ -42,3 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased]: https://github.com/k-pavlo/changes-roller/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/k-pavlo/changes-roller/releases/tag/v0.1.0
+
+## v0.2.0 (2026-02-19)
+
+### Feat
+
+- add automated release notes generation with GitHub Release Drafter
+- add automated PyPI publishing with hatchling and trusted publishers (#22)
+- add automated version management with commitizen
+- implement GitHub Actions CI/CD pipeline for automated quality assurance
