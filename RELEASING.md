@@ -67,7 +67,7 @@ git log -1 --stat
 git show HEAD
 ```
 
-### Step 3: Create Merge Request and Push Tag
+### Step 3: Create Merge Request (Do NOT Push Tag Yet)
 
 Since the main branch is protected and requires merge requests:
 
@@ -75,24 +75,36 @@ Since the main branch is protected and requires merge requests:
 # Create a release branch
 git checkout -b release/v$(git describe --tags --abbrev=0 | sed 's/v//')
 
-# Push both the branch and tag
+# Push ONLY the branch (NOT the tag yet)
 git push origin release/v$(git describe --tags --abbrev=0 | sed 's/v//')
-git push origin --tags
 
 # Create merge request from your release branch to main
 # (Use your Git hosting platform's UI or CLI)
+```
 
-# After the MR is approved and merged, the release workflow
-# will trigger automatically because the tag is already pushed
+**IMPORTANT:** Do NOT push the tag yet. Environment protection rules prevent releases from non-main branches.
+
+### Step 4: Push Tag After PR Merge
+
+After your PR is approved and merged to main:
+
+```bash
+# Switch to main and pull the merged changes
+git checkout main
+git pull origin main
+
+# Now push the tag to trigger the release
+git push origin --tags
 ```
 
 **How it works:**
 
 - The release workflow triggers when a tag matching `v*` is pushed to GitHub
-- It doesn't matter if commits reach main via direct push or merge request
-- Once your MR is merged and the tag points to a commit on main, the pipeline runs automatically
+- Environment protection rules require the tag to point to a commit on main
+- Pushing the tag before the PR merge will cause the workflow to fail
+- Once the PR is merged and you push the tag, the pipeline runs successfully
 
-### Step 4: Monitor Release Workflow
+### Step 5: Monitor Release Workflow
 
 1. Go to **Actions** tab on GitHub
 2. Watch the **Release to PyPI** workflow
@@ -101,7 +113,7 @@ git push origin --tags
    - ✅ Publish to PyPI
    - ✅ Create GitHub Release
 
-### Step 5: Verify Release
+### Step 6: Verify Release
 
 **Check PyPI:**
 
@@ -142,12 +154,15 @@ git commit -m "fix: resolve critical security vulnerability"
 # 4. Bump version (will be PATCH increment)
 cz bump
 
-# 5. Push branch and tag
+# 5. Push branch only (NOT the tag)
 git push origin hotfix/critical-fix
-git push origin --tags
 
-# 6. Create merge request to main
-# After MR is approved and merged, the release workflow triggers automatically
+# 6. Create merge request to main and get it merged
+
+# 7. After PR is merged, push the tag to trigger release
+git checkout main
+git pull origin main
+git push origin --tags
 ```
 
 ## Pre-release Versions
@@ -192,12 +207,15 @@ git commit -m "fix: resolve regression in v0.2.0"
 # 3. Bump version (PATCH increment)
 cz bump
 
-# 4. Push branch and tag
+# 4. Push branch only (NOT the tag)
 git push origin fix/regression
-git push origin --tags
 
-# 5. Create merge request and merge to main
-# Release workflow triggers automatically after merge
+# 5. Create merge request and get it merged
+
+# 6. After PR is merged, push the tag to trigger release
+git checkout main
+git pull origin main
+git push origin --tags
 ```
 
 ## Changelog Management
@@ -340,13 +358,18 @@ Draft releases are:
 The release workflow automatically creates and publishes the GitHub Release when you push a version tag.
 
 ```bash
-# After running cz bump, push branch and tag
+# After running cz bump, push ONLY the branch
 git push origin your-release-branch
-git push origin --tags  # This triggers automatic release creation
 
 # Create and merge MR to main
-# Release will be published once the MR is merged
+
+# After PR is merged, pull main and push the tag
+git checkout main
+git pull origin main
+git push origin --tags  # This triggers automatic release creation
 ```
+
+**Important:** The tag must point to a commit on main to satisfy environment protection rules.
 
 The automatic release includes:
 
